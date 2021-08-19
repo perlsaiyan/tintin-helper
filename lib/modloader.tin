@@ -1,0 +1,94 @@
+#class modloader open
+
+#var modloader-description {General purpose module handler}
+#var modloader-help {
+This module is responsible for loading other modules.  Unlike most modules\n
+it lives in lib/, as it is not actually a module.\n
+\n
+ Commands are:\n
+\tlist_modules - List modules loaded and status\n
+\tload_module  - Load a module by name\n
+}
+
+#tab load_module
+#tab list_modules
+
+#alias load_module {
+	#if {"%1" == ""} {
+		#showme Usage: load_module <module name>
+	} {
+		#class %1 {read} {$mod/%1.tin};
+	}
+}
+
+#alias register_module {
+	#class modloader assign {#var modules[%1] registered};
+}
+
+#alias fail_module {
+	#class modloader assign {#var modules[%1] failed};
+}
+
+#alias unregister_module {
+	#if {&{modules[%1]}} {
+		#unvar modules[%1];
+	} {
+		#nop
+	}
+}
+
+#alias list_modules {
+	#if {&modules[] > 0} {
+		show_modules
+	} {
+		#showme <fff>No modules loaded.
+	}
+}
+
+#alias show_modules {
+
+	#format line {<fff>%-20s  %-10s  %-30s} {module} {state} {description};
+	#showme $line;
+
+	#foreach {*modules[%*]} {i} {
+		#switch {"$modules[$i]"} {
+			#case {"failed"} { #var status <fcc>};
+			#default { #var status <afa>};
+		};
+		#format line {%-20s  $status%-10s  <ccf>%-30s} {$i} {$modules[$i]} {${$i-description}};
+		#showme $line
+	}
+}
+
+#function isloaded {
+	#if {&{modules[%1]}} {
+		#var result 1
+	} {
+		#var result 0
+	}
+}
+
+#event {READ ERROR} {
+	#showme <fcc>Critical error reading %0: "%1";
+	#regex {%0} {$mod/{.*}.tin$} {
+		#class &1 kill;
+		fail_module &1
+	} {
+		#showme Failed to extract classname from %0
+	}
+}
+
+#event {READ FILE} {
+	#regex {%0} {^$mod/{.*}.tin$} {
+		&1-register;
+	}
+}
+
+#event {CLASS DESTROYED} {
+	unregister_module %0
+}
+
+register_module modloader
+#class modloader close
+
+#nop vim: syntax=tt

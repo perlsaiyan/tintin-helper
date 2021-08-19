@@ -1,0 +1,20 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var kallisti-description {Login and session management for Legends of Kallisti}
+#var kallisti-help {Not yet implemented.}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias kallisti-register {
+	#if {@isloaded{functions}} {
+		register_module kallisti
+	} {
+		fail_module kallist
+	}
+}
+
+#nop vim: syntax=tt

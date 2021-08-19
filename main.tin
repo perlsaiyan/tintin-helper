@@ -1,0 +1,32 @@
+#nop main.tin stub
+
+#nop -- start config section
+#nop -- edit this vars to suit your location
+#nop -- Add verbiage here about handling windows and slashes
+
+#nop -- IMPORTANT NOTE for Windows users
+#nop -- use C:/path/to/whatever (note forward slashes)
+
+#var ttd /home/tom/tmp/tt-test
+#var lib $ttd/lib
+#var mod $ttd/modules
+#var db $ttd/db
+
+#nop -- end config section
+
+#split 0 1;
+#read $lib/modloader.tin;
+#screen clear scroll
+#buffer clear
+#scan txt {$ttd/motd}
+#buffer end
+
+#nop -- start module loading
+#nop -- TODO: move this to a config file
+load_module functions
+load_module kallisti
+load_module help
+load_module layout
+#nop -- end module loading
+
+#nop vim: syntax=tt

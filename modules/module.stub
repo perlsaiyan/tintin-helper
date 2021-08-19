@@ -1,0 +1,20 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var modname-description {description}
+#var modname-help {help file}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias modname-register {
+	#if {@isloaded{modloader}} {
+		register_module modname
+	} {
+		#class modname kill
+	}
+}
+
+#nop vim: syntax=tt

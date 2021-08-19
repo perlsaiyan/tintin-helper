@@ -1,0 +1,109 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var layout-description {Screen layout controls}
+#var layout-help {
+Various screen layouts.\n
+\n
+Current layout: ${layout_preference}\n
+\n
+Commands:\n
+\tlayout <choice> - set preference or show layout options\n
+}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias layout-register {
+	#if {@isloaded{functions}} {
+		register_module layout
+	} {
+		fail_module layout
+	}
+}
+
+#tab layout;
+#tab layouts;
+
+#list valid_layouts create {full} {simple};
+
+#if {!&{layout_preference}} {#var layout_preference simple};
+
+#alias layout_init {
+	#switch {"$layout_preference"} {
+		#case {"full"} {layout_full};
+		#case {"simple"} {layout_simple};
+		#default {
+			#showme <fcc>Using default, simple layout.;
+			layout_simple
+		};
+	};
+	#buffer end;
+};
+
+#alias layout {
+	#if {"%1" == ""} {
+		show_layouts
+	} {
+	  #list valid_layouts find {%1} {result};
+	  #if {$result > 0} {
+	  	#var layout_preference %1;
+	  } {
+		#showme Invalid layout.
+	  }
+	}
+}
+
+#alias show_layouts {
+	#showme <170>Layout options:;
+	#foreach {*valid_layouts[%*]} {counter} {
+		#showme \t$valid_layouts[$counter]
+	};
+}
+
+#alias layout_simple {#split 0 1}
+
+#alias layout_full {
+	#var center_panel_width 86;
+	#var tile_bg B373b41;
+	#var tile_bg2 Bff3b41;
+
+	#var top_rows 10;
+	#var bottom_rows 2;
+	#math bp_top {-1 - $bottom_rows};
+	#math left_panel 30;
+	#math right_panel 40;
+
+	#math bottom_left {$left_panel + 1};
+	#math bottom_right {$right_panel + 1};
+
+	#split $top_rows $bottom_rows $left_panel $right_panel;
+
+	#math chat_right {$right_panel + 1};
+	#math divider {${map_left} + 1};
+
+	#math map_left {@term_width{} - ${right_panel} + 2};
+	#math map_height 17;
+	#map offset 1 ${map_left} ${map_height} @term_width{};
+
+	#nop right panel;
+	#draw <$tile_bg> tile 1 -${right_panel} -4 @term_width{};
+
+	#nop left panel;
+	#draw <$tile_bg> tile 1 1 -4 $left_panel;
+
+	#nop bottom panel;
+	#draw <$tile_bg> tile $bp_top 1 -2 -1;
+
+	#nop top panel;
+	#draw <$tile_bg> tile 1 $bottom_left $top_rows -$bottom_right;
+}
+
+
+#event {SCREEN RESIZE} { layout_init };
+#event {VARIABLE UPDATED layout_preference} { layout_init };
+layout_init;
+
+#nop -- vim: syntax=tt

@@ -1,0 +1,201 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var functions-description {Generalized functions for handy things}
+#var functions-help {Many support <ccf>#function<fff>s you may find handy.}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias functions-register {
+	register_module functions
+}
+
+#nop -- Math Functions;
+#function increment { #math result {%1 + 1} }
+#function max { #if {%1 > %2} {#var result %1} {#var result %2} }
+#function pct {#math result { %1 * 100.0 / %2 }}
+#function abs { #if { %1 < 0 } {#math result { %1 * -1 } } { #var result %1 }}
+#function isOdd {#math result {%1 % 2}}
+
+#function {clamp} {
+    #if {%1 < %2} {#return %2 };
+    #if {%1 > %3} {#return %3 } {#return %1}
+}
+
+#function hNum {
+    #var _s @abs{%1};
+    #if {$_s > 1000000} {
+        #math result { %1 / 1000000.00 };
+        #var result ${result}m
+    };
+    #elseif {$_s > 1000} {
+        #math result { %1 / 1000.0 };
+        #var result ${result}k
+    };
+}
+
+#nop -- Time Functions;
+#function epoch {#format result {%T}};
+#function mpoch { #math result { @upoch{} / 1000} };
+#function upoch {#format result {%U}};
+#function lower { #format result {%l} {%0}};
+
+#function {display_progress}
+{
+    #LOCAL args[perc] {%1};
+    #LOCAL args[display] {%2};
+    #LOCAL args[length] {%3};
+    #LOCAL args[color] {%4};
+
+    #FORMAT args[display] {%.$args[length]s} {$args[display]};
+
+    #IF {"$args[color]" == ""}
+    {
+        #MATH display_color_r {2 * (1 - $args[perc])};
+        #MATH display_color_g {2 * $args[perc]};
+
+        #MATH display_color_r {5 * @clamp{$display_color_r;0;1} + 65};
+        #MATH display_color_g {5* @clamp{$display_color_g;0;1} + 65};
+
+        #FORMAT args[color] {<%a%aA><aaa>} {$display_color_r} {$display_color_g};
+        #UNVAR display_color_r;
+        #UNVAR display_color_g;
+    };
+
+    #FORMAT display_text_len {%L} {$args[display]};
+    #MATH display_text_pre {(($args[length] + 1) - $display_text_len) / 2 + $display_text_len};
+    #FORMAT args[display] {%+${display_text_pre}s} {$args[display]};
+    #FORMAT args[display] {%-$args[length]s} {$args[display]};
+    #UNVAR display_text_pre;
+    #UNVAR display_text_len;
+
+    #LOCAL i 0;
+    #LOCAL display {};
+    #PARSE {$args[display]} {display_text_char}
+    {
+        #IF {$i < $args[perc]}
+        {
+            #FORMAT display {%s%c%s} {$display} {$args[color]} {$display_text_char};
+        }
+        {
+            #FORMAT display {%s%c%s} {$display} {<099><G04>} {$display_text_char};
+        };
+
+        #MATH i {$i + (1.000/$args[length])};
+    };
+    #FORMAT display {%s%c} {$display} {<099>};
+    #UNVAR display_text_char;
+
+    #RETURN $display;
+}
+
+#function is_group_fighting {
+	#var result 0;
+    #foreach *MSDP_GROUP[%*] {_idx} {
+        #if {"$MSDP_GROUP[$_idx][position]" == "Fighting"} {#var result 1}
+    };
+}
+
+#function can_group_move {
+    #if {@is_group_fighting{}} {
+		#var result 0;
+		#return 0;
+	};
+
+    #var cgm_check 1;
+    #foreach *MSDP_GROUP[%*] {_idx} {
+        #regex {$MSDP_GROUP[$_idx][flags]} {-Knees-} {#var cgm_check 0};
+        #regex {$MSDP_GROUP[$_idx][flags]} {>BASH<} {#var cgm_check 0};
+        #if {"$MSDP_GROUP[$_idx][position]" == "Sitting"} {#var cgm_check 0};
+        #if {"$MSDP_GROUP[$_idx][position]" == "Resting"} {#var cgm_check 0};
+        #if {"$MSDP_GROUP[$_idx][position]" == "Sleeping"} {#var cgm_check 0};
+    };
+    #return $cgm_check
+}
+
+#function is_follower_missing {
+	#var result 0;
+	#foreach *MSDP_GROUP[%*] _fc {
+		#if { $MSDP_GROUP[$_fc][with_you] == 0 } { #var result 1 };
+	};
+
+	#return
+}
+
+
+#alias smart_move {
+	#if { @mpoch{} < $spellLock } {#return};
+    #if { @can_group_move{} } {
+        #if { "%1" == "" } {
+            #path w
+        } {
+            %1
+        }
+    }
+}
+
+#func hasAffect {
+    #if {&MSDP_AFFECTS[%1]} {
+        #var result $MSDP_AFFECTS[%1];
+    } {
+        #var result -1;
+    }
+}
+
+
+#function strip_ansi {#line strip #var result {%0}}
+#function next_level {#math result {$MSDP_LEVEL + 1}}
+#function pretty_tnl {#format result {%g} {$MSDP_EXPERIENCE_TNL}}
+
+#nop -- VT100/terminal functions;
+#function term_width {#screen get cols result}
+
+#function isD {
+    #var result 0;
+    #if {"%1"==""} {#return 0} {
+        #regexp {"%1"} {"%d"} {#var result 1} {#var result 0};
+    }
+}
+
+#function {is} {
+    #list {%2} {find} {%1} {result}
+}
+
+#function follower_missing {
+    #nop %0;
+    #var result 0;
+    #foreach *MSDP_GROUP[%*] _fir {
+        #if {@is{$MSDP_GROUP[$_fir][name];fol_names}} {
+            #if {$MSDP_GROUP[$_fir][with_you]==0} {
+                #return $MSDP_GROUP[$_fir][name]
+            }
+        }
+    };
+}
+
+#function unroll_number {
+    #regex {%1} {{[0-9.]+}%w} { 
+        #format {mult} {%l} {&2};
+        
+        #switch {"$mult"} {
+            #case {"k"} {#math result {&1 * 1000}};
+            #case {"m"} {#math result {&1 * 1000000}};
+            #case {"b"} {#math result {&1 * 1000000000}};
+            #case {"t"} {#math result {&1 * 1000000000000}};
+            #default {
+                #showme <cca>Invalid units '$mult';
+                #var result %1;
+                #return %1;
+            }
+        };
+        
+        #format result {%d} {$result};
+    } {
+        #var result %1
+    }
+}
+
+#nop -- vim: syntax=tt

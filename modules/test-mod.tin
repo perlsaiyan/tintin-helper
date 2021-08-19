@@ -1,0 +1,26 @@
+#nop -- This module is for testing the loader, and shouldn't be used
+
+#nop --
+#nop Class Definitions
+#nop --
+
+#var test-mod-description {Test module for modloader}
+#var test-mod-help {Just a test module to verify functionality, does nothing.}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias test-mod-register {
+	#if {@isloaded{PASS}} {
+		register_module test-mod
+	} { 
+		#class test-mod kill
+	}
+}
+
+#nop --
+#nop Regular module stuff goes here
+#nop --
+
+#nop vim: syntax=tt
