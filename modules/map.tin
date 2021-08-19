@@ -1,0 +1,130 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var map-description {description}
+#var map-help {help file}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias map-register {
+	#if {!@isloaded{functions}} {
+		#showme ERROR: functions module not loaded;
+		fail_module map;
+		#class map kill
+	};
+	#elseif {!@isloaded{msdp}} {
+		#showme ERROR: msdp module not loaded;
+		fail_module map;
+		#class map kill
+	};
+	#elseif {!@isloaded{layout}} {
+		#showme ERROR: layout module not loaded;
+		fail_module map;
+		#class map kill
+	};
+	#elseif {!&{MSDP_ROOM_VNUM}} {
+		#showme ERROR: MSDP values not populated (load module after connection?);
+		fail_module map;
+		#class map kill
+	};
+	#else {
+		#map goto {${MSDP_ROOM_VNUM}} {dig};
+		register_module map
+	}
+}
+
+#nop -- ---------------------------------------------------------------
+#nop -- Variables
+#nop -- ---------------------------------------------------------------
+
+#map create 100000;
+#map flag nofollow;
+#map flag vtmap on;
+#map flag static;
+#map flag blockgraphics on;
+#map read $db/msdp.map
+
+#map terrain {Forest} {<228>⟑} DENSE WIDE
+#map terrain {Field} {<128>·} DENSE WIDE
+#map terrain {Desert} {<cca>·} DENSE NARROW
+#map terrain {Inside} {<f707880>▒} DENSE WIDE
+#map terrain {Deep Water} {<f2232ff>▒} DENSE WIDE
+#map terrain {Water} {<f2284ff>▒} DENSE WIDE
+
+#list mapZoneBlacklist create {BLACKLISTS};
+layout_init;
+
+#nop -- ---------------------------------------------------------------
+#nop -- Aliases
+#nop -- ---------------------------------------------------------------
+
+
+#alias mapRoom {
+	#map goto {$MSDP_ROOM_VNUM} {dig};
+	#map set roomarea $MSDP_AREA_NAME;
+	#map set roomname $MSDP_ROOM_NAME;
+	#map set roomterrain @strip_ansi{$MSDP_ROOM_TERRAIN};
+	#map set roomcolor <178>;
+
+	#if {@mapZoneBlacklist{$MSDP_AREA_NAME}} {#return};
+
+	#foreach {north;south;east;west;up;down} {EXIT} {
+
+		#if {&MSDP_ROOM_EXITS[$EXIT]} {
+			#map get {roomexits} {EXIT_LIST};
+			#if {&EXIT_LIST[$EXIT] == 0}
+			{
+				#map get {roomvnum} {EXIT_VNUM} {$MSDP_ROOM_EXITS[$EXIT]};
+				#if {("$MSDP_ROOM_EXITS[$EXIT]" != "?") &&
+					("$MSDP_ROOM_EXITS[$EXIT]" != "L") &&
+					("$MSDP_ROOM_EXITS[$EXIT]" != "C")} {
+					#map dig {@dA{$EXIT}} {$MSDP_ROOM_EXITS[$EXIT]};
+				};
+				#if {$EXIT_VNUM == 0}
+				{
+					#map set {roomcolor} {<118>} {$MSDP_ROOM_EXITS[$EXIT]}
+				}
+			}
+		} {
+			#nop -- Room exit doesn't exist, delete;
+			#map get {roomexits} {EXIT_LIST};
+			#if {&EXIT_LIST[$EXIT] != 0} {
+				#map delete $EXIT
+			};
+		}
+
+	};
+
+}
+
+#nop -- ---------------------------------------------------------------
+#nop -- Actions
+#nop -- ---------------------------------------------------------------
+
+#nop -- ---------------------------------------------------------------
+#nop -- Events
+#nop -- ---------------------------------------------------------------
+#nop #event {SESSION DISCONNECTED} {#map write $db/msdp.map}
+
+
+#nop -- ---------------------------------------------------------------
+#nop -- Functions
+#nop -- ---------------------------------------------------------------
+#function dA {
+    #if {"%1" == "east"} {#var result e};
+    #elseif {"%1" == "west"} {#var result w};
+    #elseif {"%1" == "north"} {#var result n};
+    #elseif {"%1" == "south"} {#var result s};
+    #elseif {"%1" == "up"} {#var result u};
+    #elseif {"%1" == "down"} {#var result d};
+    #else {#var result %1};
+}
+
+#function mapZoneBlacklist {
+	#list mapZoneBlacklist find {%0} {result}
+}
+
+#nop -- vim: syntax=tt
