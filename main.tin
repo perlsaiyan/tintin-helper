@@ -37,7 +37,7 @@ load_module kal_comms
 
 #nop -- load additional configuration
 #if {&local_config"} {
-	#read $ttd/config.tin
+	#read $ttd/${local_config}
 };
 
 
