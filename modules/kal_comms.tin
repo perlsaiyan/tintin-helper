@@ -1,0 +1,112 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var kal_comms-description {LoK communications logging support}
+#var kal_comms-help {coming soon}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias kal_comms-register {
+	#if {@isloaded{events}} {
+		register_module kal_comms
+	} {
+		#showme ERROR: events not loaded;
+		fail_module kal_comms
+	}
+}
+
+#alias kal_comms-unregister {
+	event_remove_handler kal_comms;
+	}
+
+#var chat[rows] 10;
+
+
+#alias {update_chat} {
+	#if {&chat[log][] >= $chat[rows]} {
+		#list chat[log] del 1
+	};
+	#list chat[log] ins -1 {%2};
+	#if {@isloaded{layout}} {
+		layout_comms_update
+	};
+}
+
+
+#nop -- ---------------------------------------------------------------
+#nop -- Group communications
+#nop -- ---------------------------------------------------------------
+#action {^You grouptell: {.*}} {
+    event_raise {commsGroup} {$name} {%1} {%0};
+} {8}
+#action {^**%w: '%2'$} {
+   event_raise {commsGroup} {%1} {%2} {%0};
+} {8}
+
+#action {^<Clan: %w> '{.*}'} {
+    event_raise {commsClan} {%1} {%2} {%0};
+} {8}
+#action {^You cchat, '{.*}'} {
+    event_raise {commsClan} {$name} {%1} {%0};
+} {9}
+
+#action {^<Gossip: %w> '{.*}'$} {
+    event_raise {commsGos} {%1} {%2} {%0};
+} {3}
+#action {^<Gossip: %w ({.*})> '{.*}'$} {
+    event_raise {commsGos} {%1 (%2)} {%3} {%0};
+} {4}
+
+#action {^<Gemote> '%1 %2'$} {
+    event_raise {commsGos} {%1} {%2} {%0};
+}
+
+#action {^<Development: %w> '%2'$} {
+    event_raise {commsDev} {%1} {%2} {%0};
+} {8}
+#action {^<Development: %w ({.*})> '%3'$} {
+    event_raise {commsDev} {%1 (%2)} {%3} {%0};
+} {7}
+
+#action {^<Advice: %w> '%2'$} {
+    event_raise {commsDev} {%1} {%2} {%0};
+} {8}
+#action {^<Advice: %w (%w)> '%3'$} {
+    event_raise {commsDev} {%1 (%2)} {%3} {%0};
+} {7}
+
+
+#action {^%w ({.*}) tells you, '{.*}'$} {
+    event_raise {commsTell} {%1 (%2)} {%3} {%0};
+} {8}
+#action {^You tell {.*}, '{.*}'$} {
+    event_raise {commsTell} {me (to %1)} {%2} {%0};
+} {8}
+
+#action {^The winds whisper, '{.*}'} {
+    event_raise {commsWorld} {%1} {%0};
+} {9}
+
+#action {^[%w:(%w)] {.*}} {
+	event_raise {commsChat} {%2} {%0};
+} {9}
+#action {^[%w:] {.*}} {
+	event_raise {commsChat} {%2} {%0};
+} {9}
+
+#nop -- ---------------------------------------------------------------
+#nop -- Events
+#nop -- ---------------------------------------------------------------
+event_register {commsGroup} {kal_comms} {update_chat group {%4}};
+event_register {commsClan}  {kal_comms} {update_chat clan {%4}};
+event_register {commsGos}   {kal_comms} {update_chat gos {%4}};
+event_register {commsTell}  {kal_comms} {update_chat tell {%4}};
+event_register {commsWorld} {kal_comms} {update_chat world {%3}};
+event_register {commsDev}   {kal_comms} {update_chat dev {%4}};
+event_register {commsChat}  {kal_comms} {update_chat chat {%3}};
+
+
+#nop -- vim: syntax=tt

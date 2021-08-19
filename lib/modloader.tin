@@ -6,8 +6,9 @@ This module is responsible for loading other modules.  Unlike most modules\n
 it lives in lib/, as it is not actually a module.\n
 \n
  Commands are:\n
-\tlist_modules - List modules loaded and status\n
-\tload_module  - Load a module by name\n
+\tlist_modules  - List modules loaded and status\n
+\tload_module   - Load a module by name\n
+\tunload_module - Unload a module by name
 }
 
 #tab load_module
@@ -18,6 +19,19 @@ it lives in lib/, as it is not actually a module.\n
 		#showme Usage: load_module <module name>
 	} {
 		#class %1 {read} {$mod/%1.tin};
+	}
+}
+
+#alias unload_module {
+	#if {"%1" == ""} {
+		#showme Usage: unload_module <module name>
+	} {
+		#if {@isloaded{%1}} {
+			%1-unregister;
+			#class %1 kill
+		} {
+			#showme Module '%1' is not loaded.
+		}
 	}
 }
 

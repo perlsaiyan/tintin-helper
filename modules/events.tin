@@ -1,0 +1,93 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var events-description {Better events than stock tintin++}
+#var events-help {
+Commands:\n
+\tevent_register <eventName> <handlerName> <action> - register a new event trigger\n
+\tevent_remove_event <eventName>                    - completely remove event\n
+\tevent_remove_handler <handlerName>                - remove handler from all events\n
+\tevent_remove_specific <eventName> <handlerName>   - remove handler from one event\n
+\tevent_raise <eventName> <args>                    - raise an event
+}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias events-register {
+	#if {@isloaded{modloader}} {
+		register_module events
+	} {
+		#class events kill
+	}
+}
+
+
+#var _events {};
+#alias _event_tmp_ali #nop;
+
+#nop event_register eventName handlerName action
+#nop adds action to the eventName event under the tag handlerName.
+
+#alias event_register
+{
+  #var _events[%1][%2] {%3};
+}
+
+
+#nop event_remove_event eventName
+#nop removes eventName completely
+
+#alias event_remove_event
+{
+  #unvar _events[%1];
+}
+
+
+#nop event_remove_handler handlerName
+#nop removes handlerName from all events
+
+#alias event_remove_handler
+{
+
+  #foreach {*{_events[]}} {sublist}
+  {
+    #unvar _events[$sublist][%1];
+    #if {"${_events[$sublist]}" == ""} {#unvar _events[$sublist]};
+  }
+}
+
+
+#nop event_remove_specific eventName handlerName
+#nop removes handlerName from eventName
+
+#alias event_remove_specific
+{
+  #unvar _events[%1][%2];
+  #if {"${_events[%1]}" == ""} {#unvar _events[%1]};
+}
+
+
+#nop event_eval is a helper function that allows dynamic alias definitions.
+
+#alias event_eval
+{
+  #alias _event_tmp_ali {%1};
+  _event_tmp_ali %2;
+  #alias _event_tmp_ali #nop;
+}
+
+#nop event_raise eventName args
+#nop calls all actions for eventName with args
+
+#alias event_raise
+{
+  #foreach {*{_events[%1][]}} {handler}
+  {
+    event_eval {${_events[%1][$handler]}} {%0};
+  }
+} {5}
+
+#nop -- vim: syntax=tt

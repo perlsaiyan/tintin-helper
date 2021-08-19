@@ -27,10 +27,12 @@
 #nop -- start module loading
 #nop -- TODO: move this to a config file
 load_module functions
+load_module events
 load_module msdp
 load_module help
 load_module layout
 load_module kallisti
+load_module kal_comms
 #nop -- end module loading
 
 #nop -- load additional configuration

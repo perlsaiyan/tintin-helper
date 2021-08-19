@@ -122,7 +122,8 @@ but no user interaction is needed.  Data is stored in MSDP_%*.
 		};
         #case {"ROOM_VNUM"}
         {
-            mapRoom;
+			#nop need to handle this differently with an event;
+            #if {@isloaded{map}} {mapRoom};
         };
 	}
 }
@@ -141,12 +142,10 @@ but no user interaction is needed.  Data is stored in MSDP_%*.
 	#variable {PROTOCOL[MSDP]} {1}
 }
 
-#event {VARIABLE UPDATE MSDP_AREA_NAME} {event_raise {variable MSDP_AREA_NAME} {%1}};
-#event {VARIABLE UPDATE MSDP_HERO_POINTS} {event_raise {variable MSDP_HERO_POINTS} {%1}};
-#event {VARIABLE UPDATE MSDP_GROUP} {event_raise {variable MSDP_GROUP} {null}};
-
-
-#alias mapRoom {#nop %0} {9};
-#alias event_raise {#nop %0} {9};
+#if {@isloaded{events}} {
+	#event {VARIABLE UPDATE MSDP_AREA_NAME} {event_raise {variable MSDP_AREA_NAME} {%1}};
+	#event {VARIABLE UPDATE MSDP_HERO_POINTS} {event_raise {variable MSDP_HERO_POINTS} {%1}};
+	#event {VARIABLE UPDATE MSDP_GROUP} {event_raise {variable MSDP_GROUP} {null}};
+}
 
 #nop -- vim: syntax=tt
