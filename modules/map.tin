@@ -32,7 +32,8 @@
 	};
 	#else {
 		#map goto {${MSDP_ROOM_VNUM}} {dig};
-		register_module map
+		register_module map;
+		layout_init;
 	}
 }
 
@@ -55,7 +56,6 @@
 #map terrain {Water} {<f2284ff>▒} DENSE WIDE
 
 #list mapZoneBlacklist create {BLACKLISTS};
-layout_init;
 
 #nop -- ---------------------------------------------------------------
 #nop -- Aliases

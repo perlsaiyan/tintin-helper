@@ -63,9 +63,15 @@ Commands:\n
 	};
 }
 
-#alias layout_simple {#split 0 1}
+#alias layout_simple {
+	#split 0 1;
+	#if {@isloaded{map}} {
+		#map flag vtmap off;
+	};
+}
 
 #alias layout_full {
+
 	#var center_panel_width 86;
 	#var tile_bg B373b41;
 	#var tile_bg2 Bff3b41;
@@ -86,7 +92,11 @@ Commands:\n
 
 	#math map_left {@term_width{} - ${right_panel} + 2};
 	#math map_height 17;
-	#map offset 1 ${map_left} ${map_height} @term_width{};
+
+	#if {@isloaded{map}} {
+		#map flag vtmap on;
+		#map offset 1 ${map_left} ${map_height} @term_width{};
+	};
 
 	#nop right panel;
 	#draw <$tile_bg> tile 1 -${right_panel} -4 @term_width{};
@@ -99,6 +109,9 @@ Commands:\n
 
 	#nop top panel;
 	#draw <$tile_bg> tile 1 $bottom_left $top_rows -$bottom_right;
+
+	#nop right side panel border line;
+	#draw <B282A2E><fff> line 1 -${right_panel} -2 -${right_panel};
 }
 
 

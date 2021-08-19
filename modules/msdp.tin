@@ -25,17 +25,17 @@ but no user interaction is needed.  Data is stored in MSDP_%*.
 #nop MSDP config stuff
 #nop --
 
-#var         {DO}  {ý}
-#var         {DONT}  {þ}
-#var         {IAC}  {ÿ}
+#var         {DO}  \xFD;
+#var         {DONT}  \xFE;
+#var         {IAC}  \xFF;
 #var         {PROTOCOL}  {{MSDP}{0}}
 #var         {PROTOCOL_MSDP}  {E}
-#var         {SB}  {ú}
-#var         {SE}  {ð}
-#var         {VAL}  {}
-#var         {VAR}  {}
-#var         {WILL}  {û}
-#var         {WONT}  {ü}
+#var         {SB}  \xFA;
+#var         {SE}  \xF0;
+#var         {VAL} \x02;
+#var         {VAR} \x01;
+#var         {WILL}  \xFB;
+#var         {WONT}  \xFC;
 #var         {msdpOldList}  {}
 #var {MAXINT} {2147483647}
 
