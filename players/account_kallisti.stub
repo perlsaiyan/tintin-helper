@@ -1,0 +1,9 @@
+#nop Sample account file
+
+#list modules_on_connect create layout kal_comms;
+
+#var account_name {}
+#var account_password {}
+
+
+#nop vim: syntax=tt
