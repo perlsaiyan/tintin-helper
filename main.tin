@@ -24,9 +24,11 @@
 #nop -- start module loading
 #nop -- TODO: move this to a config file
 load_module functions
-load_module kallisti
+load_module msdp
 load_module help
 load_module layout
+load_module kallisti
+
 #nop -- end module loading
 
 #nop vim: syntax=tt

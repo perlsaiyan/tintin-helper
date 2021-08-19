@@ -1,0 +1,152 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var msdp-description {Enable Mud Server Data Protocol}
+#var msdp-help {
+<179>This module does need to load before connecting to your MUD,<099>\n
+but no user interaction is needed.  Data is stored in MSDP_%*.
+}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias msdp-register {
+	#if {@isloaded{functions}} {
+		register_module msdp
+	} {
+		#showme ERROR: functions module not loaded;
+		#class msdp kill
+	}
+}
+
+#nop --
+#nop MSDP config stuff
+#nop --
+
+#var         {DO}  {ý}
+#var         {DONT}  {þ}
+#var         {IAC}  {ÿ}
+#var         {PROTOCOL}  {{MSDP}{0}}
+#var         {PROTOCOL_MSDP}  {E}
+#var         {SB}  {ú}
+#var         {SE}  {ð}
+#var         {VAL}  {}
+#var         {VAR}  {}
+#var         {WILL}  {û}
+#var         {WONT}  {ü}
+#var         {msdpOldList}  {}
+#var {MAXINT} {2147483647}
+
+#nop --
+
+#alias {MSDP_CONFIGURE %1,%2}
+{
+	#local {i} {};
+	#local {index} {1};
+	#list {MSDP_VALUES} {create} {%2};
+	#send {$IAC$SB$PROTOCOL_MSDP\};
+	#foreach {%1} {i}
+	{
+		#send {${VAR}${i}${VAL}${MSDP_VALUES[$index]}\};
+		#math {index} {$index+1}
+	};
+	#send {$IAC$SE\}
+}
+{9}
+
+#alias {MSDP_LIST}
+{
+	#send {$IAC$SB$PROTOCOL_MSDP${VAR}LIST${VAL}REPORTABLE_VARIABLES$IAC$SE\}
+}
+{9}
+
+#alias {MSDP_REPORT}
+{
+	#local {i} {};
+	#variable {result} {$IAC$SB$PROTOCOL_MSDP${VAR}REPORT};
+	#foreach {*{MSDP_REPORTABLE_VARIABLES[]}} {i}
+	{
+		#variable {result} {${result}${VAL}${MSDP_REPORTABLE_VARIABLES[${i}]}}
+	};
+	#send {$result$IAC$SE\}
+}
+{9}
+
+#alias {MSDP_SEND %*}
+{
+	#send {$IAC$SB$PROTOCOL_MSDP${VAR}SEND${VAL}%1$IAC$SE\}
+}
+{9}
+
+#alias {^MSDP$}
+{
+	#if {${PROTOCOL[%0]}}
+	{
+		#echo {%0 enabled.}
+	};
+	#else
+	{
+		#echo {%0 disabled.}
+	}
+}
+{9}
+
+#event {IAC SB MSDP}
+{
+	#nop Save all variables in an MSDP list.;
+	#switch {"%0"} {
+		#case {"EXPERIENCE"} {
+			#if {%1 < 0} {
+				#var tmpXP %1;
+				#math {MSDP_EXPERIENCE} { (2 * $MAXINT) + $tmpXP };
+			}  {
+				#variable {MSDP_%0} {%1}
+			}
+		};
+		#default {
+			#variable {MSDP_%0} {@strip_ansi{%1}};
+		}
+	};
+	#variable {msdpOldList[%0]} {%1};
+	#switch {"%0"}
+	{
+		#case {"PLAY_SOUND"}
+		{
+			PLAY %1
+		};
+		#case {"REPORTABLE_VARIABLES"}
+		{
+			MSDP_REPORT
+		};
+        #case {"ROOM_VNUM"}
+        {
+            mapRoom;
+        };
+	}
+}
+
+#event {IAC SB MSDP IAC SE}
+{
+	#nop
+}
+
+#event {IAC WILL MSDP}
+{
+	#send {$IAC$DO$PROTOCOL_MSDP\};
+	MSDP_LIST;
+	#nop {Uncomment the next line to use MSDP for sound instead of MSP};
+	#nop {MSDP_CONFIGURE sound,1};
+	#variable {PROTOCOL[MSDP]} {1}
+}
+
+#event {VARIABLE UPDATE MSDP_AREA_NAME} {event_raise {variable MSDP_AREA_NAME} {%1}};
+#event {VARIABLE UPDATE MSDP_HERO_POINTS} {event_raise {variable MSDP_HERO_POINTS} {%1}};
+#event {VARIABLE UPDATE MSDP_GROUP} {event_raise {variable MSDP_GROUP} {null}};
+
+
+#alias mapRoom {#nop %0} {9};
+#alias event_raise {#nop %0} {9};
+
+#nop -- vim: syntax=tt
