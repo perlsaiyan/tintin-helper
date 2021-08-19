@@ -12,6 +12,9 @@
 #var mod $ttd/modules
 #var db $ttd/db
 
+#nop point this at an optional local .tin to load at boot
+#var local_config {}
+
 #nop -- end config section
 
 #split 0 1;
@@ -28,7 +31,12 @@ load_module msdp
 load_module help
 load_module layout
 load_module kallisti
-
 #nop -- end module loading
+
+#nop -- load additional configuration
+#if {&local_config"} {
+	#read $ttd/config.tin
+};
+
 
 #nop vim: syntax=tt

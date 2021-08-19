@@ -69,12 +69,12 @@ it lives in lib/, as it is not actually a module.\n
 }
 
 #event {READ ERROR} {
-	#showme <fcc>Critical error reading %0: "%1";
 	#regex {%0} {$mod/{.*}.tin$} {
+		#showme <fcc>Critical error reading %0: "%1";
 		#class &1 kill;
 		fail_module &1
 	} {
-		#showme Failed to extract classname from %0
+		#nop
 	}
 }
 
