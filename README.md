@@ -10,7 +10,8 @@ or make the default MUD-agnostic and show how to enable Kallisti.
 I've been trying to keep it safe for tt++ on linux, and wintin on Windows 10, and so far that seems
 to be working.
 
-This is not yet production ready, but please feel free to test and provide feedback.
+This is not yet production ready, but please feel free to test and provide feedback.  It does require
+tt++/wintin 2.02.11 or relatively close in a few modules.
 
 What works today:
 * Basic layouts:
