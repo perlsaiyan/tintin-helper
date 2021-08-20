@@ -41,6 +41,7 @@ it lives in lib/, as it is not actually a module.\n
 
 #alias fail_module {
 	#class modloader assign {#var modules[%1] failed};
+	#var %1-description {%2}
 }
 
 #alias unregister_module {
@@ -86,7 +87,7 @@ it lives in lib/, as it is not actually a module.\n
 	#regex {%0} {$mod/{.*}.tin$} {
 		#showme <fcc>Critical error reading %0: "%1";
 		#class &1 kill;
-		fail_module &1
+		fail_module {&1} {<fcc>%1}
 	} {
 		#nop
 	}

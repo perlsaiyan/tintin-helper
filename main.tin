@@ -11,6 +11,7 @@
 #var lib $ttd/lib
 #var mod $ttd/modules
 #var db $ttd/db
+#var players $ttd/players
 
 #nop point this at an optional local .tin to load at boot
 #var local_config {}
@@ -30,9 +31,10 @@ load_module functions
 load_module events
 load_module msdp
 load_module help
-load_module layout
+
+#nop -- This module will control kallisti accounts
 load_module kallisti
-load_module kal_comms
+
 #nop -- end module loading
 
 #nop -- load additional configuration

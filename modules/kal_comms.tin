@@ -18,6 +18,16 @@
 	}
 }
 
+#nop --
+#nop Initialize some port stuff
+#nop --
+#info sessions save;
+#if {!&info[SESSIONS][comms]} {
+	#port {init} {comms} {0};
+	#ses -
+}
+
+
 #alias kal_comms-unregister {
 	event_remove_handler kal_comms;
 	}
@@ -39,7 +49,7 @@
 #nop -- ---------------------------------------------------------------
 #nop -- Group communications
 #nop -- ---------------------------------------------------------------
-#action {^You grouptell: {.*}} {
+#action {~^\e[1;36mYou grouptell: {.*}} {
     event_raise {commsGroup} {$name} {%1} {%0};
 } {8}
 #action {^**%w: '%2'$} {
@@ -53,14 +63,14 @@
     event_raise {commsClan} {$name} {%1} {%0};
 } {9}
 
-#action {^<Gossip: %w> '{.*}'$} {
+#action {~^\e[1;35m<Gossip: %w> '{.*}'$} {
     event_raise {commsGos} {%1} {%2} {%0};
 } {3}
-#action {^<Gossip: %w ({.*})> '{.*}'$} {
+#action {~^\e[1;35m<Gossip: %w ({.*})> '{.*}'$} {
     event_raise {commsGos} {%1 (%2)} {%3} {%0};
 } {4}
 
-#action {^<Gemote> '%1 %2'$} {
+#action {~^\e[1;35m<Gemote> '%1 %2'$} {
     event_raise {commsGos} {%1} {%2} {%0};
 }
 

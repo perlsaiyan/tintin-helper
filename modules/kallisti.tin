@@ -3,7 +3,7 @@
 #nop --
 
 #var kallisti-description {Login and session management for Legends of Kallisti}
-#var kallisti-help {Not yet implemented.}
+#var kallisti-help {Use connect to connect to Legends of Kallisti on the main port.}
 
 #nop --
 #nop Modloader Stuff
@@ -16,5 +16,36 @@
 		fail_module kallist
 	}
 }
+
+#tab connect
+
+#alias connect {
+	#showme attempt to create session for player %1.;
+	#session k%1 {kallistimud.com} {4000} {$players/%1_kallisti.player}
+}
+
+#alias post_connect_load {
+	#foreach {$modules_on_connect[%*]} {module} {
+		load_module $module
+	}
+}
+
+#act {^Enter your account name.} {
+	#send ${account_name};
+	#class account read {$players/${account_name}_kallisti.account}
+}
+
+#act {^Please enter your account password (or just press <ENTER> to abort login):} {
+	#send ${account_password};
+	#if {"${account_dont_forget_password}" != "true"} {
+		#showme <fcc>Forgetting password.;
+		#unvar account_password;
+	};
+}
+
+#act {^                             *** PRESS ENTER ***} {#send motd}
+
+#act {^Welcome to the legendary lands of Kallisti.} {post_connect_load}
+#act {^Reconnecting.} {post_connect_load}
 
 #nop vim: syntax=tt

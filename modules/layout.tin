@@ -17,6 +17,7 @@ Commands:\n
 #nop --
 
 #alias layout-register {
+	#nop need to check: events;
 	#if {@isloaded{functions}} {
 		register_module layout
 	} {
@@ -31,6 +32,7 @@ Commands:\n
 #if {!&{layout_preference}} {#var layout_preference simple};
 
 #alias layout_init {
+	#nop %0;
 	#switch {"$layout_preference"} {
 		#case {"full"} {layout_full};
 		#case {"simple"} {layout_simple};
@@ -77,7 +79,7 @@ Commands:\n
 	#var tile_bg B373b41;
 	#var tile_bg2 Bff3b41;
 
-	#var top_rows 10;
+	#var top_rows 11;
 	#var bottom_rows 2;
 	#math bp_top {-1 - $bottom_rows};
 	#math left_panel 30;
@@ -111,6 +113,7 @@ Commands:\n
 	#nop top panel;
 	#draw <$tile_bg> tile 1 $bottom_left $top_rows -$bottom_right;
 
+	
 	#nop right side panel border line;
 	#draw <B282A2E><fff> line 1 -${right_panel} -2 -${right_panel};
 }
@@ -119,12 +122,13 @@ Commands:\n
 
 	#var tile_bg B373b41;
 
-	#var top_rows 10;
+	#var top_rows 11;
 	#var bottom_rows 2;
 	#math bp_top {-1 - $bottom_rows};
 	#math right_panel 40;
 	#math bottom_right {$right_panel + 1};
 
+	#math top_div $top_rows + 1;
 	#split $top_rows $bottom_rows 0 $right_panel;
 
 	#math chat_right {$right_panel + 1};
@@ -146,6 +150,7 @@ Commands:\n
 
 	#nop top panel;
 	#draw <$tile_bg> tile 1 1 $top_rows -$bottom_right;
+	#draw <B282A2E><fff> line $top_rows 1 $top_rows -${right_panel};
 
 	#nop right side panel border line;
 	#draw <B282A2E><fff> line 1 -${right_panel} -2 -${right_panel};
@@ -154,16 +159,17 @@ Commands:\n
 #alias update_top_panel {
 	#switch {"$layout_preference"} {
 		#case {"full"} {
-			#line sub {var;esc} #draw <B373b38> tile 1 $bottom_left $top_rows -$bottom_right
+			#line sub {var;esc} #draw <B373b38> tile 1 $bottom_left $chat[rows] -$bottom_right
 			 $chat[log][-10..-1];
 		};
 		#case {"right"} {
-			#line sub {var;esc} #draw <B373b38> tile 1 1 $top_rows -$bottom_right
+			#line sub {var;esc} #draw <B373b38> tile 1 1 $chat[rows] -$bottom_right
 			 $chat[log][-10..-1];
 		};
 
 		#default {#nop}
 	};
+	#nop %0
 };
 
 #alias layout_comms_update {
@@ -174,8 +180,15 @@ Commands:\n
 	};
 };
 
+#alias layout_reset {
+	layout_init;
+	#buffer end
+}
+
 #event {SCREEN RESIZE} { layout_init };
 #event {VARIABLE UPDATED layout_preference} { layout_init };
 layout_init;
+
+event_register {SESSION ACTIVATED} {layout} {layout_reset %1}
 
 #nop -- vim: syntax=tt

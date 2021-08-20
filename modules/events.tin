@@ -90,4 +90,6 @@ Commands:\n
   }
 } {5}
 
+#event {SESSION ACTIVATED} { event_raise {SESSION ACTIVATED} {%0}}
+
 #nop -- vim: syntax=tt
