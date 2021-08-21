@@ -56,21 +56,21 @@ init comms-session comms;
 #action {~^\e[1;36mYou grouptell: {.*}} {
     event_raise {commsGroup} {$name} {%1} {%0};
 } {8}
-#action {^**%w: '%2'$} {
+#action {~^\e[1;36m**%w: '%2'$} {
    event_raise {commsGroup} {%1} {%2} {%0};
 } {8}
 
-#action {^<Clan: %w> '{.*}'} {
+#action {~^\e[1;36m<Clan: %w> '{.*}'} {
     event_raise {commsClan} {%1} {%2} {%0};
 } {8}
-#action {^You cchat, '{.*}'} {
+#action {~^\e[1;36mYou cchat, '{.*}'} {
     event_raise {commsClan} {$name} {%1} {%0};
 } {9}
 
-#action {~^\e[1;35m<Gossip: %w> '{.*}'$} {
+#action {~^\e[1;35m<Gossip: %w> '{.*}'\e[0m$} {
     event_raise {commsGos} {%1} {%2} {%0};
 } {3}
-#action {~^\e[1;35m<Gossip: %w ({.*})> '{.*}'$} {
+#action {~^\e[1;35m<Gossip: %w ({.*})> '{.*}'\e[0m$} {
     event_raise {commsGos} {%1 (%2)} {%3} {%0};
 } {4}
 
@@ -78,25 +78,25 @@ init comms-session comms;
     event_raise {commsGos} {%1} {%2} {%0};
 }
 
-#action {^<Development: %w> '%2'$} {
+#action {~^\e[0;36m<Development: %w> '%2'\e[0m$} {
     event_raise {commsDev} {%1} {%2} {%0};
 } {8}
-#action {^<Development: %w ({.*})> '%3'$} {
+#action {~^\e[0;36m<Development: %w ({.*})> '%3'\e[0m$} {
     event_raise {commsDev} {%1 (%2)} {%3} {%0};
 } {7}
 
-#action {^<Advice: %w> '%2'$} {
+#action {~^\e[0;36m<Advice: %w> '%2'$} {
     event_raise {commsDev} {%1} {%2} {%0};
 } {8}
-#action {^<Advice: %w (%w)> '%3'$} {
+#action {~^\e[0;36m<Advice: %w (%w)> '%3'$} {
     event_raise {commsDev} {%1 (%2)} {%3} {%0};
 } {7}
 
 
-#action {^%w ({.*}) tells you, '{.*}'$} {
+#action {~^\e[1;36m%w ({.*}) tells you, '{.*}'$} {
     event_raise {commsTell} {%1 (%2)} {%3} {%0};
 } {8}
-#action {^You tell {.*}, '{.*}'$} {
+#action {~^\e[1;36mYou tell {.*}, '{.*}'$} {
     event_raise {commsTell} {me (to %1)} {%2} {%0};
 } {8}
 
@@ -104,10 +104,10 @@ init comms-session comms;
     event_raise {commsWorld} {%1} {%0};
 } {9}
 
-#action {^[%w:(%w)] {.*}} {
+#action {~^\e[1;36m[%w:(%w)] {.*}} {
 	event_raise {commsChat} {%2} {%0};
 } {9}
-#action {^[%w:] {.*}} {
+#action {~^\e[1;36m[%w:] {.*}} {
 	event_raise {commsChat} {%2} {%0};
 } {9}
 
