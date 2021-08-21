@@ -107,10 +107,10 @@ init comms-session comms;
 } {7}
 
 
-#action {~^\e[1;36m%w ({.*}) tells you, '{.*}'$} {
+#action {~^\e[1;36m%w ({.*}) tells you, '{.*}'\e[0m$$} {
     event_raise {commsTell} {%1 (%2)} {%3} {%0};
 } {8}
-#action {~^\e[1;36mYou tell {.*}, '{.*}'$} {
+#action {~^\e[1;36mYou tell {.*}, '{.*}'\e[0m$} {
     event_raise {commsTell} {me (to %1)} {%2} {%0};
 } {8}
 
