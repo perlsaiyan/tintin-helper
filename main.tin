@@ -12,6 +12,7 @@
 #var mod $ttd/modules
 #var db $ttd/db
 #var players $ttd/players
+#var log $ttd/log
 
 #nop point this at an optional local .tin to load at boot
 #var local_config {}
