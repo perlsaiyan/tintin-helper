@@ -30,6 +30,8 @@ init comms-session comms;
 }
 
 #${comms-session} #macro {OP} {#ses k${account_name}};
+#${comms-session} #event {SESSION ACTIVATED} {#buffer end};
+
 #macro {OQ} {#ses ${comms-session}};
 
 #alias kal_comms-unregister {
@@ -47,8 +49,15 @@ init comms-session comms;
 	#if {@isloaded{layout}} {
 		layout_comms_update
 	};
+	send_to_comms_session %2
 }
 
+#alias {send_to_comms_session} {
+	#info sessions save;
+	#if {&info[SESSIONS][${comms-session}]} {
+		#${comms-session} #showme %0
+	}
+}
 
 #nop -- ---------------------------------------------------------------
 #nop -- Group communications
