@@ -21,7 +21,7 @@
 
 #alias connect {
 	#showme attempt to create session for player %1.;
-	#session k%1 {kallistimud.com} {4000} {$players/%1_kallisti.player}
+	#session kallisti:%1 {kallistimud.com} {4000} {$players/%1_kallisti.player}
 }
 
 #alias post_connect_load {
