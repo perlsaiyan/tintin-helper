@@ -95,7 +95,11 @@ it lives in lib/, as it is not actually a module.\n
 
 #event {READ FILE} {
 	#regex {%0} {^$mod/{.*}.tin$} {
-		&1-register;
+		#if {&{&1-register-delay}} {
+			#line oneshot #tick {&1-register-delay} {&1-register} {${&1-register-delay}}
+		} {
+			&1-register;
+		}
 	}
 }
 

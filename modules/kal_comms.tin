@@ -21,16 +21,20 @@
 #nop --
 #nop Initialize some port stuff
 #nop --
+init comms-session comms;
+
 #info sessions save;
-#if {!&info[SESSIONS][comms]} {
-	#port {init} {comms} {0};
-	#ses -
+#if {!&info[SESSIONS][${comms-session}]} {
+	#line quiet #port {init} {${comms-session}} {0};
+	#ses -;
 }
 
+#${comms-session} #macro {OP} {#ses k${account_name}};
+#macro {OQ} {#ses ${comms-session}};
 
 #alias kal_comms-unregister {
 	event_remove_handler kal_comms;
-	}
+}
 
 #var chat[rows] 10;
 

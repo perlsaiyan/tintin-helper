@@ -4,6 +4,7 @@
 
 #var map-description {description}
 #var map-help {help file}
+#var map-register-delay 3
 
 #nop --
 #nop Modloader Stuff
@@ -26,8 +27,9 @@
 		#class map kill
 	};
 	#elseif {!&{MSDP_ROOM_VNUM}} {
-		#showme ERROR: MSDP values not populated (load module after connection?);
+		#showme <fcc>ERROR: MSDP values not populated, will reload map in <ccf>5<fcc> seconds.;
 		fail_module map;
+		#class modloader assign {#line oneshot #tick {reload map} {load_module map} {5}};
 		#class map kill
 	};
 	#else {
