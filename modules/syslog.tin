@@ -1,0 +1,48 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var syslog-description {Logging routines}
+#var syslog-help {
+Usage: syslog <facility> <priority> <message>\n
+\n
+Valid priorities:\n
+\temerg      system is unusable\n
+\talert      action must be taken immediately\n
+\tcrit       critical conditions\n
+\terr        error conditions\n
+\twarn       warning conditions\n
+\tnotice     normal, but significant, condition\n
+\tinfo       informational message\n
+\tdebug      debug-level message\n
+\n
+You can also use debug, info, warn, err, crit or emerg commands which require\n
+only two arguments, facility and message.
+}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias syslog-register {
+	#if {@isloaded{functions}} {
+		register_module syslog
+	} {
+		fail_module syslog 'functions' module not loaded;
+	}
+}
+
+#alias {syslog %1 %2 %3} {
+	#echo {<fac>${syslog-prechar} %1 [%2] : %3}
+};
+
+init syslog-prechar syslog >>
+#alias {debug %1 %2} {syslog %1 debug %2}
+#alias {info %1 %2} {syslog %1 info %2}
+#alias {warn %1 %2} {syslog %1 warn %2}
+#alias {err %1 %2} {syslog %1 err %2}
+#alias {crit %1 %2} {syslog %1 crit %2}
+#alias {emerg %1 %2} {syslog %1 emerg %2}
+
+
+#nop vim: syntax=tt

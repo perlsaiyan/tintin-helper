@@ -13,7 +13,7 @@
 	#if {@isloaded{modloader}} {
 		register_module modname
 	} {
-		#class modname kill
+		fail_module modname unknown reason
 	}
 }
 

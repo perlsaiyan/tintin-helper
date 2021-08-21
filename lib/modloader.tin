@@ -39,10 +39,14 @@ it lives in lib/, as it is not actually a module.\n
 	#class modloader assign {#var modules[%1] registered};
 }
 
-#alias fail_module {
+#alias {fail_module %1 %2} {
 	#class modloader assign {#var modules[%1] failed};
 	#var %1-description {%2}
-}
+} {5}
+
+#alias {fail_module %1} {
+	fail_module %1 Unknown error (dev needs to add reason)
+} {7}
 
 #alias unregister_module {
 	#if {&{modules[%1]}} {
