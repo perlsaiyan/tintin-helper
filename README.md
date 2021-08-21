@@ -26,8 +26,12 @@ What works today:
 * Automatic subscription to all MSDP values
 * Registration status of loaded modules with error handling
 * In-game help command for modules
+* Basic syslog/info display support
 
-
+What's coming next:
+* better comms logging in a separate session
+* data tile placement in the panels, and samples, like Kallisti-specifc zone and group info
+* logging controls
 
 Screenshots:
 ![Layout "full"](/screenshots/layout_full.jpg?raw=true "Comms bar, bottom bar, right and left panels")
