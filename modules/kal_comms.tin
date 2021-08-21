@@ -18,6 +18,10 @@
 	}
 }
 
+#alias kal_comms-unregister {
+	#zap ${comms-session}
+}
+
 #nop --
 #nop Initialize some port stuff
 #nop --
@@ -29,8 +33,9 @@ init comms-session comms;
 	#ses -;
 }
 
-#${comms-session} #macro {OP} {#ses k${account_name}};
+#${comms-session} #macro {OP} {#ses kallisti:${account_name}};
 #${comms-session} #event {SESSION ACTIVATED} {#buffer end};
+#gts event_register {SESSION DISCONNECTED kallisti:${account_name}} {#zap ${comms-session}}
 
 #macro {OQ} {#ses ${comms-session}};
 
