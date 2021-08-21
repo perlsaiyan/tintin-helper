@@ -26,8 +26,9 @@
 
 #alias post_connect_load {
 	#foreach {$modules_on_connect[%*]} {module} {
-		load_module $module
-	}
+			load_module $module
+	};
+	#line oneshot #tick {clear} {#buffer end} {0.5};
 }
 
 #act {^Enter your account name.} {
