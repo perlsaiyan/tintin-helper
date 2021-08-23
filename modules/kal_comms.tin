@@ -33,9 +33,9 @@ init comms-session comms;
 	#ses -;
 }
 
-#${comms-session} #macro {OP} {#ses kallisti:${account_name}};
+#${comms-session} #macro {OP} {#ses kallisti:${char_name}};
 #${comms-session} #event {SESSION ACTIVATED} {#buffer end};
-#gts event_register {SESSION DISCONNECTED kallisti:${account_name}} {#zap ${comms-session}}
+#gts event_register {SESSION DISCONNECTED kallisti:${char_name}} {#zap ${comms-session}}
 
 #macro {OQ} {#ses ${comms-session}};
 
@@ -70,7 +70,7 @@ init comms-session comms;
 #action {~^\e[1;36mYou grouptell: {.*}} {
     event_raise {commsGroup} {$name} {%1} {%0};
 } {8}
-#action {~^\e[1;36m**%w: '%2'$} {
+#action {~^\e[1;36m**%w: '%2'\e[0m$} {
    event_raise {commsGroup} {%1} {%2} {%0};
 } {8}
 
