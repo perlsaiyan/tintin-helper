@@ -47,14 +47,18 @@ init comms-session comms;
 
 
 #alias {update_chat} {
+	#var _msg %2;
+	#regex {_msg} {{} {\{};
+	#regex {_msg} {}} {\}};
+
 	#if {&chat[log][] >= $chat[rows]} {
 		#list chat[log] del 1
 	};
-	#list chat[log] ins -1 {%2};
+	#list chat[log] ins -1 {$_msg};
 	#if {@isloaded{layout}} {
 		layout_comms_update
 	};
-	send_to_comms_session %2
+	send_to_comms_session $_msg
 }
 
 #alias {send_to_comms_session} {

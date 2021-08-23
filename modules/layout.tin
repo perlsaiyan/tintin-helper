@@ -159,12 +159,10 @@ Commands:\n
 #alias update_top_panel {
 	#switch {"$layout_preference"} {
 		#case {"full"} {
-			#line sub {var;esc} #draw <B373b38> tile 1 $bottom_left $chat[rows] -$bottom_right
-			 $chat[log][-10..-1];
+			#draw <B373b38> tile 1 $bottom_left $chat[rows] -$bottom_right $chat[log][-10..-1];
 		};
 		#case {"right"} {
-			#line sub {var;esc} #draw <B373b38> tile 1 1 $chat[rows] -$bottom_right
-			 $chat[log][-10..-1];
+			#line sub {var;esc} #draw <B373b38> tile 1 1 $chat[rows] -$bottom_right {$chat[log][-10..-1]};
 		};
 
 		#default {#nop}
