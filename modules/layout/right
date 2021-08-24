@@ -37,7 +37,7 @@
 
 	#buffer end
 	update_top_panel;
-	display_right_tiles
+	#if {&{right_tiles}} {display_right_tiles};
 }
 
 #alias {update_top_panel} {
