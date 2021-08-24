@@ -35,14 +35,27 @@
 	#nop right side panel border line;
 	#draw <B282A2E><fff> line 1 -${right_panel} -2 -${right_panel};
 
-	update_top_panel;
 	#buffer end
+	update_top_panel;
+	display_right_tiles
 }
 
 #alias {update_top_panel} {
     #draw <B373b38> tile 1 1 $chat[rows] -$bottom_right $chat[log][-10..-1];
     #nop
 };
+
+#alias {display_right_tiles} {
+    #math right_leftside {1 - ${right_panel}};
+    #math _bottom_row {$map_height};
+
+    #foreach {$right_tiles[%*]} {tile} {
+        #math _top_row {$_bottom_row + 1};
+        #math _bottom_row {$_top_row + $tile[height] - 1};
+
+        #draw $tile[color] tile $_top_row ${right_leftside} $_bottom_row -1 ${$tile[content]}
+    }
+}
 
 #alias {layout_comms_update} { update_top_panel };
 
