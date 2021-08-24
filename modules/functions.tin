@@ -125,6 +125,21 @@
 	#return
 }
 
+#func {withMe} {
+    #if {$MSDP_GROUP[%1][with_you] == 1} {
+        #var result <ffff>
+    } {
+        #var result <fbbb>
+    }
+}
+#func {colorPct} {
+    #if { %1 > 95 } { #var result <f68f473>%1};
+    #elseif { %1 > 80 } { #var result <f3ae722>%1};
+    #elseif { %1 > 60 } { #var result <fdcf24b>%1};
+    #elseif { %1 > 40 } { #var result <feca826>%1};
+    #elseif { %1 > 20 } { #var result <fec3d26>%1};
+    #elseif { %1 <=20 } { #var result <fec2b41>%1};
+}
 
 #alias smart_move {
 	#if { @mpoch{} < $spellLock } {#return};

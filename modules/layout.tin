@@ -55,17 +55,61 @@ Commands:\n
 	};
 }
 
-#alias layout_reset {layout_init}
-
-#event {SCREEN RESIZE} { layout_init };
-#event {VARIABLE UPDATED layout_preference} { layout_init };
-
-event_register {SESSION ACTIVATED} {layout} {layout_reset %1}
+#alias layout_reset {layout_init;#nop %0}
 
 #if {&{layout_preference}} {
 	layout ${layout_preference}
 } {
 	layout simple
 }
+
+#event {SCREEN RESIZE} { layout_init };
+#event {VARIABLE UPDATED layout_preference} { layout_init };
+
+event_register {SESSION ACTIVATED} {layout} {layout_reset %1}
+
+
+#nop -- This probably needs a better home, but let's set up some tiles if they don't;
+#nop -- already exist;
+
+#if {!&{right_tiles}} {
+	#var right_tiles[1][height] 2;
+	#var right_tiles[1][type] tile;
+	#var right_tiles[1][color] <B5f819d>;
+	#var right_tiles[1][content] area_info;
+	#var right_tiles[2][height] 10;
+	#var right_tiles[2][type] tile;
+	#var right_tiles[2][color] <B85678f>;
+	#var right_tiles[2][content] group_info[%*];
+}
+
+#nop -- Let's populate two tiles as samples as they're commonly asked for;
+event_register {variable MSDP_AREA_NAME} {right} {generate_area_info {%0} {%1} {%2}};
+event_register {variable MSDP_GROUP} {right} {generate_group_info {%0} {%1} {%2}};
+
+#alias generate_group_info {
+    syslog right info generate new group info - %2;
+    #list group_info create {<Ffff>Group (level ${MSDP_GROUPLEVEL})};
+    #foreach *MSDP_GROUP[%*] {_idx} {
+        #format _line {<ffff>%-5s %-10.9s %-3s %-3s %-3s <ffff>%-4s}
+            {@withMe{$_idx}[$MSDP_GROUP[$_idx][class]]}
+            {$MSDP_GROUP[$_idx][name]}
+            {@colorPct{$MSDP_GROUP[$_idx][health]}}
+            {@colorPct{$MSDP_GROUP[$_idx][mana]}}
+            {@colorPct{$MSDP_GROUP[$_idx][stamina]}}
+            {$MSDP_GROUP[$_idx][flags]};
+             #list group_info add {{$_line}};
+    };
+    display_right_tiles
+}
+
+#alias generate_area_info {
+    syslog right debug generate new area info - %1|%2|%3;
+    #var area_info {${MSDP_AREA_NAME}\nLevel: $MSDP_AREA_MINLEVEL - $MSDP_AREA_MAXLEVEL};
+    display_right_tiles
+}
+
+generate_area_info;
+generate_group_info;
 
 #nop -- vim: syntax=tt
