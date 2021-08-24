@@ -1,0 +1,57 @@
+#alias layout_init {
+
+	#var center_panel_width 86;
+	#var tile_bg B373b41;
+	#var tile_bg2 Bff3b41;
+
+	#var top_rows 11;
+	#var bottom_rows 2;
+	#math bp_top {-1 - $bottom_rows};
+	#math left_panel 30;
+	#math right_panel 40;
+
+	#math bottom_left {$left_panel + 1};
+	#math bottom_right {$right_panel + 1};
+
+	#split $top_rows $bottom_rows $left_panel $right_panel;
+
+	#math chat_right {$right_panel + 1};
+	#math divider {${map_left} + 1};
+
+	#math map_left {@term_width{} - ${right_panel} + 2};
+	#math map_height 17;
+
+	#if {@isloaded{map}} {
+		#map flag vtmap on;
+		#map offset 1 ${map_left} ${map_height} @term_width{};
+	};
+
+	#nop right panel;
+	#draw <$tile_bg> tile 1 -${right_panel} -4 @term_width{};
+
+	#nop left panel;
+	#draw <$tile_bg> tile 1 1 -4 $left_panel;
+
+	#nop bottom panel;
+	#draw <$tile_bg> tile $bp_top 1 -2 -1;
+
+	#nop top panel;
+	#draw <$tile_bg> tile 1 $bottom_left $top_rows -$bottom_right;
+
+	
+	#nop right side panel border line;
+	#draw <B282A2E><fff> line 1 -${right_panel} -2 -${right_panel};
+	
+	update_top_panel;
+	#buffer end
+}
+
+
+#alias update_top_panel {
+	#draw <B373b38> tile 1 $bottom_left $chat[rows] -$bottom_right $chat[log][-10..-1];
+	#nop %0
+};
+
+#alias layout_comms_update {update_top_panel}
+
+#nop vim: syntax=tt

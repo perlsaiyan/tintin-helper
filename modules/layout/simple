@@ -1,0 +1,11 @@
+#alias layout_init {
+	#split 0 1;
+	#if {@isloaded{map}} {
+		#map flag vtmap off;
+	};
+}
+
+#alias update_top_panel {#nop};
+#alias layout_comms_update {#nop};
+
+#nop -- vim: syntax=tt
