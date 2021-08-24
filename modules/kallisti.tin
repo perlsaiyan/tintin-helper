@@ -49,4 +49,35 @@
 #act {^Welcome to the legendary lands of Kallisti.} {post_connect_load}
 #act {^Reconnecting.} {post_connect_load}
 
+
+#nop -- Let's populate two tiles as samples as they're commonly asked for;
+event_register {variable MSDP_AREA_NAME} {right} {generate_area_info {%0} {%1} {%2}};
+event_register {variable MSDP_GROUP} {right} {generate_group_info {%0} {%1} {%2}};
+
+#alias generate_group_info {
+    syslog right info generate new group info - %2;
+    #list group_info create {<Ffff>Group (level ${MSDP_GROUPLEVEL})};
+    #foreach *MSDP_GROUP[%*] {_idx} {
+        #format _line {<ffff>%-5s %-10.9s %-3s %-3s %-3s <ffff>%-4s}
+            {@withMe{$_idx}[$MSDP_GROUP[$_idx][class]]}
+            {$MSDP_GROUP[$_idx][name]}
+            {@colorPct{$MSDP_GROUP[$_idx][health]}}
+            {@colorPct{$MSDP_GROUP[$_idx][mana]}}
+            {@colorPct{$MSDP_GROUP[$_idx][stamina]}}
+            {$MSDP_GROUP[$_idx][flags]};
+             #list group_info add {{$_line}};
+    };
+    #if {@isloaded{layout}} {display_right_tiles}
+}
+
+#alias generate_area_info {
+    syslog right debug generate new area info - %1|%2|%3;
+    #var area_info {${MSDP_AREA_NAME}\nLevel: $MSDP_AREA_MINLEVEL - $MSDP_AREA_MAXLEVEL};
+    #if {@isloaded{layout}} {display_right_tiles}
+}
+
+#nop -- generate_area_info;
+#nop -- generate_group_info;
+
+
 #nop vim: syntax=tt
