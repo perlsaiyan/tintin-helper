@@ -56,7 +56,11 @@ event_register {variable MSDP_GROUP} {right} {generate_group_info {%0} {%1} {%2}
 
 #alias generate_group_info {
     syslog right info generate new group info - %2;
-    #list group_info create {<Ffff>Group (level ${MSDP_GROUPLEVEL})};
+    #if {(!&{MSDP_GROUP}) || (&MSDP_GROUP[] == 0)} {
+		#list group_info create {<Ffff>Not Grouped};
+    } {
+    	#list group_info create {<Ffff>Group (level ${MSDP_GROUPLEVEL})};
+	};
     #foreach *MSDP_GROUP[%*] {_idx} {
         #format _line {<ffff>%-5s %-10.9s %-3s %-3s %-3s <ffff>%-4s}
             {@withMe{$_idx}[$MSDP_GROUP[$_idx][class]]}
