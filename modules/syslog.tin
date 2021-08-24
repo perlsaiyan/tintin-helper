@@ -32,13 +32,6 @@ only two arguments, facility and message.
 	}
 }
 
-init loglevel_preference syslog warn;
-#alias {syslog %1 %2 %3} {
-	#if {$loglevels[%2] >= $loglevels[${loglevel_preference}]} {
-		#echo {<fac>${syslog-prechar} %1 [%2] : %3}
-	}
-};
-
 #var loglevels[debug] 0
 #var loglevels[info] 1
 #var loglevels[notice] 2
@@ -47,6 +40,14 @@ init loglevel_preference syslog warn;
 #var loglevels[crit] 5
 #var loglevels[alert] 6
 #var loglevels[emerg] 7
+
+init loglevel_preference syslog warn;
+#alias {syslog %1 %2 %3} {
+	#if {$loglevels[%2] >= $loglevels[${loglevel_preference}]} {
+		#echo {<fac>${syslog-prechar} %1 [%2] : %3}
+	}
+};
+
 
 
 init syslog-prechar syslog >>
