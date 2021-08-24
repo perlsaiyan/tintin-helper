@@ -44,7 +44,7 @@
 	};
 }
 
-#act {^                             *** PRESS ENTER ***} {#send motd}
+#act {^                             *** PRESS ENTER ***} {#send motd;#send 3 $char_name;#send 1}
 
 #act {^Welcome to the legendary lands of Kallisti.} {post_connect_load}
 #act {^Reconnecting.} {post_connect_load}

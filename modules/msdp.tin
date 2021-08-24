@@ -96,6 +96,8 @@ but no user interaction is needed.  Data is stored in MSDP_%*.
 #event {IAC SB MSDP}
 {
 	#nop Save all variables in an MSDP list.;
+	debug msdp Received MSDP value %0;
+
 	#switch {"%0"} {
 		#case {"EXPERIENCE"} {
 			#if {%1 < 0} {
@@ -110,6 +112,13 @@ but no user interaction is needed.  Data is stored in MSDP_%*.
 		}
 	};
 	#variable {msdpOldList[%0]} {%1};
+
+	#nop -- Fire an event on MSDP variable updates;
+	#if {@isloaded{events}} {
+		syslog msdp debug event_raise {variable %0} {%1};
+		event_raise {variable MSDP_%0} {%1}
+	};
+
 	#switch {"%0"}
 	{
 		#case {"PLAY_SOUND"}
@@ -142,10 +151,5 @@ but no user interaction is needed.  Data is stored in MSDP_%*.
 	#variable {PROTOCOL[MSDP]} {1}
 }
 
-#if {@isloaded{events}} {
-	#event {VARIABLE UPDATE MSDP_AREA_NAME} {event_raise {variable MSDP_AREA_NAME} {%1}};
-	#event {VARIABLE UPDATE MSDP_HERO_POINTS} {event_raise {variable MSDP_HERO_POINTS} {%1}};
-	#event {VARIABLE UPDATE MSDP_GROUP} {event_raise {variable MSDP_GROUP} {null}};
-}
 
 #nop -- vim: syntax=tt

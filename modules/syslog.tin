@@ -32,9 +32,22 @@ only two arguments, facility and message.
 	}
 }
 
+init loglevel_preference syslog warn;
 #alias {syslog %1 %2 %3} {
-	#echo {<fac>${syslog-prechar} %1 [%2] : %3}
+	#if {$loglevels[%2] >= $loglevels[${loglevel_preference}]} {
+		#echo {<fac>${syslog-prechar} %1 [%2] : %3}
+	}
 };
+
+#var loglevels[debug] 0
+#var loglevels[info] 1
+#var loglevels[notice] 2
+#var loglevels[warn] 3
+#var loglevels[err] 4
+#var loglevels[crit] 5
+#var loglevels[alert] 6
+#var loglevels[emerg] 7
+
 
 init syslog-prechar syslog >>
 #alias {debug %1 %2} {syslog %1 debug %2}
@@ -44,5 +57,21 @@ init syslog-prechar syslog >>
 #alias {crit %1 %2} {syslog %1 crit %2}
 #alias {emerg %1 %2} {syslog %1 emerg %2}
 
+#alias {log %1} {
+	#if {"%1" == "on"} {
+			#format {logfile} {$log/%t-%s.log} {%Y-%m-%d} {$char_name};
+			#log append $logfile;
+			syslog log info Logging is now on.
+	};
+	#elseif {"%1" == "off"} {
+			#log off;
+			syslog log info Logging is now off.
+	};
+	#else {
+		#showme Usage: log <on|off>;
+		#showme {};
+		#log info
+	};
+}
 
 #nop vim: syntax=tt
