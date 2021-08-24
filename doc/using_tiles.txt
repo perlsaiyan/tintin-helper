@@ -1,0 +1,30 @@
+To use data tiles, you'll need a layout loaded which supports them.  The
+included layout 'full' has both a left and right panel, while 'right' has
+a single panel on the right side.
+
+To use them, you'll need to populate the right_tiles or left_tiles values:
+
+#nop this is the height of the tile in rows;
+#var right_tiles[1][height] 2
+
+#nop this is the type of tile (only tile currently supported, box coming);
+#var right_tiles[1][type] tile
+
+#nop this is the background color of the tile;
+#var right_tiles[1][color] <B5f819d>
+
+#nop this is a simple variable, the tile will contain the contents;
+#var right_tiles[1][content] area_info
+
+#nop This tile will be directly below the first tile, but the content;
+#nop is held in a list;
+#var right_tiles[2][height] 10
+#var right_tiles[2][type] tile
+#var right_tiles[2][color] <B85678f>
+#var right_tiles[2][content] group_info[%*]
+
+All you should have to do is update the value in $area_info or $group_info[]
+and use the display_right_tiles command.
+
+The process is the same for the left, but the variable is left_tiles and you
+call display_left_tiles to update the display.

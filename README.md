@@ -19,19 +19,18 @@ What works today:
   right - panel at top and right, bottom status bar, input line
   simple - input line only
 * Mapping, with permanent onscreen map in full and right layouts
-* Basic communications trapping and top panel display
+* Basic communications trapping, top panel display, and separate session with history
 * Login and account management for Legends of Kallisti
 * Support for custom/individual tintin scripts
 * Kallisti module supports connection, and password management (forget after use)
-* Automatic subscription to all MSDP values
+* Automatic subscription to all MSDP values, and event firing when they update
 * Registration status of loaded modules with error handling
 * In-game help command for modules
 * Basic syslog/info display support
+* data tile placement in the panels, and samples, like Kallisti-specifc zone and group info
 
 What's coming next:
-* better comms logging in a separate session
-* data tile placement in the panels, and samples, like Kallisti-specifc zone and group info
-* logging controls
+* better logging controls
 
 Screenshots:
 ![Layout "full"](/screenshots/layout_full.jpg?raw=true "Comms bar, bottom bar, right and left panels")

@@ -1,5 +1,5 @@
 These files will be different depending on your mud and which session handler you use,
-but the below is for legends of Kallisti.
+but the below is for Legends of Kallisti.
 
 For each account, you'll need something like this, named *accountname_kallisti.account*:
 ```
@@ -24,6 +24,7 @@ For each player, you'll need something like this, named *playername_kallisti.pla
 #list modules_on_connect create layout kal_comms map;
 
 #var account_name satori
+#var char_name kensho
 #var layout_preference full
 #var comms-session com
 
