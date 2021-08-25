@@ -32,6 +32,7 @@ What works today:
 What's coming next:
 * better logging controls
 * more tile options and commands
+* character switching without reconnecting
 
 Screenshots:
 ![Layout "full"](/screenshots/layout_full.jpg?raw=true "Comms bar, bottom bar, right and left panels")
