@@ -31,6 +31,7 @@ What works today:
 
 What's coming next:
 * better logging controls
+* more tile options and commands
 
 Screenshots:
 ![Layout "full"](/screenshots/layout_full.jpg?raw=true "Comms bar, bottom bar, right and left panels")
