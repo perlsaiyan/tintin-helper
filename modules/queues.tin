@@ -1,0 +1,154 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var queues-description {description}
+#var queues-help {help file}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias queues-register {
+	#if {@isloaded{modloader}} {
+		register_module queues
+	} {
+		fail_module queues unknown reason
+	}
+}
+#var spellLock 0;
+
+#list spellValidPositions create Flying Fighting Mounted Standing;
+
+#alias queueAdd {
+    #list _queue[%1] find {%2} {sindex};
+    #if {$sindex} {
+        info spell Not adding "%2" as it is already in list at position $sindex;
+    }   {
+        info spell Adding spell "%2" to %1 queue;
+        #list _queue[%1] add {%2};
+        queue_block
+    };
+
+}
+
+#alias {nco %1} {queueAdd nco {%1}}
+
+#alias queueRunner {
+    #if { @mpoch{} > $spellLock} {
+        #if {&{_queue[priority][]}} {
+            #if {@spell_can_cast{}} {
+                info spell Casting $_queue[priority][1];
+                spell_cast_actual $_queue[priority][1];
+                #list {_queue[priority]} delete 1;
+                queue_block;
+                #break
+            };
+        };
+        #if {&{_queue[heal][]}} {
+            #if {@spell_can_cast{}} {
+                info spell Casting $_queue[heal][1];
+                spell_cast_actual $_queue[heal][1];
+                #list {_queue[heal]} delete 1;
+                queue_block;
+                #break
+            };
+        };
+        #if {&{_queue[any][]}} {
+            #if {@spell_can_cast{}} {
+                info spell Casting $_queue[any][1];
+                spell_cast_actual $_queue[any][1];
+                #list {_queue[any]} delete 1;
+                queue_block;
+                #break
+            };
+        };
+        #if {&{_queue[combat][]}} {
+            #if {"$MSDP_POSITION" == "Fighting"} {
+                #if {@spell_can_cast{}} {
+                    info spell Casting $_queue[combat][1];
+                    spell_cast_actual $_queue[combat][1];
+                    #list {_queue[combat]} delete 1;
+                    queue_block;
+                    #break
+                };
+            } {
+                info spell Not in combat, clearing spell queue;
+                #list {_queue[combat]} clear;
+            }
+        };
+        #if {&{_queue[nco][]}} {
+            #if {"$MSDP_POSITION" != "Fighting"} {
+                #if {@spell_can_cast{}} {
+                    info spell Casting $_queue[nco][1];
+                    spell_cast_actual $_queue[nco][1];
+                    #list {_queue[nco]} delete 1;
+                    queue_block;
+                    #break
+                };
+            };
+        };
+    }
+}
+
+#alias spell_cast_actual {
+    #list spellParts create %0;
+    info cast %0;
+    %0;
+    #math spellLock { @max{$spellLock;@mpoch{}} + @spellDelay{$spellParts[1]}}
+}
+
+
+#alias {queue_block} {
+
+    #format {queue_block} {<388>%-39s<088>\nPriority: %d     Heal: %d     Any: %d\n  Combat: %d      NCO: %d}
+    	{Action Queues}
+        &_queue[priority][]
+        &_queue[heal][]
+        &_queue[any][]
+        &_queue[combat][]
+        &_queue[nco][];
+
+	display_right_tiles
+}
+
+#nop -- ---------------------------------------------------------------
+#nop -- Functions
+#nop -- ---------------------------------------------------------------
+
+#function {spell_can_cast} {
+    #var result 1;
+    #list spellValidPositions find {$MSDP_POSITION} {check};
+    #if {$check == 0} { #var result 0};
+    #regex $PLAYER_FLAGS {-Knees-} { #var result 0 };
+    #regex $PLAYER_FLAGS {>BASH<}  { #var result 0 };
+}
+
+#nop -- Spell delays are in 1000ths of a second;
+#func spellDelay {
+    #switch {"%1"} {
+        #case {"heal"} #var result 2000;
+        #case {"convert"} #var result 12000;
+        #case {"shapechange"} #var result 4000;
+        #case {"fst"} #var result 3000;
+        #case {"charge"} #var result 3000;
+        #case {"smart_move"} #var result 250;
+        #case {"mobAttack"} #var result 8000;
+        #case {"fkill"} #var result 5000;
+        #case {"get"} #var result 500;
+        #case {"drop"} #var result 500;
+        #default {
+            #var result 2000;
+            info spell Unknown delay for %1, using $result ms
+            };
+    }
+}
+
+
+#nop -- ---------------------------------------------------------------
+#nop -- Ticks
+#nop -- ---------------------------------------------------------------
+#tick {queue runner} {queueRunner} {0.2};
+event_register {VARIABLE UPDATED spellqueue} {queue_block}
+
+#nop -- vim: syntax=tt
