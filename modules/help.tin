@@ -25,7 +25,7 @@
 	  #showme ${%1-help};
 	  #showme;
 	} {
-	  #showme No help available for %1, sorry.
+	  #send {help %0}
 	}
 }
 #nop vim: syntax=tt

@@ -55,7 +55,7 @@ event_register {variable MSDP_AREA_NAME} {right} {generate_area_info {%0} {%1} {
 event_register {variable MSDP_GROUP} {right} {generate_group_info {%0} {%1} {%2}};
 
 #alias generate_group_info {
-    syslog right info generate new group info - %2;
+    syslog right debug generate new group info - %2;
     #if {(!&{MSDP_GROUP}) || (&MSDP_GROUP[] == 0)} {
 		#list group_info create {<Ffff>Not Grouped};
     } {

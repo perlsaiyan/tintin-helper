@@ -35,7 +35,7 @@ init comms-session comms;
 
 #${comms-session} #macro {OP} {#ses kallisti:${char_name}};
 #${comms-session} #event {SESSION ACTIVATED} {#buffer end};
-#gts event_register {SESSION DISCONNECTED kallisti:${char_name}} {#zap ${comms-session}}
+#gts event_register {SESSION DISCONNECTED kallisti:${char_name}} {kal_comms} {#zap ${comms-session}}
 
 #macro {OQ} {#ses ${comms-session}};
 

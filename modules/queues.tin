@@ -18,7 +18,7 @@
 }
 #var spellLock 0;
 
-#list spellValidPositions create Flying Fighting Mounted Standing;
+#list spellValidPositions create Flying Fighting Mounted Standing Swimming;
 
 #alias queueAdd {
     #list _queue[%1] find {%2} {sindex};
@@ -137,6 +137,7 @@
         #case {"fkill"} #var result 5000;
         #case {"get"} #var result 500;
         #case {"drop"} #var result 500;
+        #case {"harvest"} #var result 0;
         #default {
             #var result 2000;
             info spell Unknown delay for %1, using $result ms
