@@ -335,7 +335,7 @@ Usage: levelreq <startlevel> <endlevel>}
 	}
 }
 
-#sub {Hero Points: %1} {Herps:  <098>%1 [@level_for_herps{%1}]}
+#sub {Hero Points: %1} {Hero Pts:<098>%1 [@level_for_herps{%1}]}
 
 #tab levelreq
 #alias {levelreq} {
