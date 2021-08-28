@@ -1,0 +1,378 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var kallisti/levels-description {Additional level and xp information}
+#var kallisti/levels-help {
+Adds information to score screen about what level you can reach with\n
+your current hero points.\n
+\n
+It can also supply information about requirements for levelling:\n
+Usage: levelreq <startlevel> <endlevel>}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias kallisti/levels-register {
+	#if {@isloaded{modloader}} {
+		register_module kallisti/levels
+	} {
+		fail_module kallisti/levels unknown reason
+	}
+}
+
+
+#var explevel[1] 0
+#var explevel[2] 100
+#var explevel[3] 300
+#var explevel[4] 600
+#var explevel[5] 1000
+#var explevel[6] 2000
+#var explevel[7] 4000
+#var explevel[8] 8000
+#var explevel[9] 14000
+#var explevel[10] 20000
+#var explevel[11] 25000
+#var explevel[12] 29000
+#var explevel[13] 32000
+#var explevel[14] 35000
+#var explevel[15] 38000
+#var explevel[16] 42000
+#var explevel[17] 46000
+#var explevel[18] 50000
+#var explevel[19] 55000
+#var explevel[20] 60000
+#var explevel[21] 70000
+#var explevel[22] 80000
+#var explevel[23] 90000
+#var explevel[24] 100000
+#var explevel[25] 125000
+#var explevel[26] 150000
+#var explevel[27] 175000
+#var explevel[28] 200000
+#var explevel[29] 225000
+#var explevel[30] 250000
+#var explevel[31] 300000
+#var explevel[32] 350000
+#var explevel[33] 400000
+#var explevel[34] 450000
+#var explevel[35] 500000
+#var explevel[36] 600000
+#var explevel[37] 700000
+#var explevel[38] 800000
+#var explevel[39] 900000
+#var explevel[40] 1000000
+#var explevel[41] 1200000
+#var explevel[42] 1400000
+#var explevel[43] 1700000
+#var explevel[44] 2000000
+#var explevel[45] 2400000
+#var explevel[46] 2800000
+#var explevel[47] 3300000
+#var explevel[48] 3800000
+#var explevel[49] 4400000
+#var explevel[50] 5000000
+#var explevel[51] 6000000
+#var explevel[52] 8000000
+#var explevel[53] 10000000
+#var explevel[54] 12500000
+#var explevel[55] 15000000
+#var explevel[56] 20000000
+#var explevel[57] 25000000
+#var explevel[58] 30000000
+#var explevel[59] 35000000
+#var explevel[60] 40000000
+#var explevel[61] 45000000
+#var explevel[62] 50000000
+#var explevel[63] 50000000
+#var explevel[64] 55000000
+#var explevel[65] 60000000
+#var explevel[66] 65000000
+#var explevel[67] 70000000
+#var explevel[68] 75000000
+#var explevel[69] 80000000
+#var explevel[70] 85000000
+#var explevel[71] 90000000
+#var explevel[72] 95000000
+#var explevel[73] 100000000
+#var explevel[74] 105000000
+#var explevel[75] 110000000
+#var explevel[76] 115000000
+#var explevel[77] 120000000
+#var explevel[78] 125000000
+#var explevel[79] 130000000
+#var explevel[80] 135000000
+#var explevel[81] 140000000
+#var explevel[82] 145000000
+#var explevel[83] 150000000
+#var explevel[84] 155000000
+#var explevel[85] 160000000
+#var explevel[86] 165000000
+#var explevel[87] 170000000
+#var explevel[88] 180000000
+#var explevel[89] 190000000
+#var explevel[90] 200000000
+#var explevel[91] 250000000
+#var explevel[92] 300000000
+#var explevel[93] 350000000
+#var explevel[94] 400000000
+#var explevel[95] 500000000
+#var explevel[96] 600000000
+#var explevel[97] 700000000
+#var explevel[98] 800000000
+#var explevel[99] 900000000
+#var explevel[100] 1000000000
+#var herolevel[1] 0
+#var herolevel[2] 0
+#var herolevel[3] 0
+#var herolevel[4] 0
+#var herolevel[5] 0
+#var herolevel[6] 0
+#var herolevel[7] 0
+#var herolevel[8] 0
+#var herolevel[9] 0
+#var herolevel[10] 0
+#var herolevel[11] 0
+#var herolevel[12] 0
+#var herolevel[13] 0
+#var herolevel[14] 0
+#var herolevel[15] 0
+#var herolevel[16] 0
+#var herolevel[17] 0
+#var herolevel[18] 0
+#var herolevel[19] 0
+#var herolevel[20] 0
+#var herolevel[21] 0
+#var herolevel[22] 0
+#var herolevel[23] 0
+#var herolevel[24] 0
+#var herolevel[25] 0
+#var herolevel[26] 0
+#var herolevel[27] 0
+#var herolevel[28] 0
+#var herolevel[29] 0
+#var herolevel[30] 0
+#var herolevel[31] 0
+#var herolevel[32] 0
+#var herolevel[33] 0
+#var herolevel[34] 0
+#var herolevel[35] 0
+#var herolevel[36] 0
+#var herolevel[37] 0
+#var herolevel[38] 0
+#var herolevel[39] 0
+#var herolevel[40] 0
+#var herolevel[41] 0
+#var herolevel[42] 0
+#var herolevel[43] 0
+#var herolevel[44] 0
+#var herolevel[45] 0
+#var herolevel[46] 0
+#var herolevel[47] 0
+#var herolevel[48] 0
+#var herolevel[49] 0
+#var herolevel[50] 0
+#var herolevel[51] 3000
+#var herolevel[52] 3800
+#var herolevel[53] 4600
+#var herolevel[54] 5400
+#var herolevel[55] 6200
+#var herolevel[56] 6800
+#var herolevel[57] 7400
+#var herolevel[58] 8000
+#var herolevel[59] 8500
+#var herolevel[60] 9000
+#var herolevel[61] 9500
+#var herolevel[62] 10000
+#var herolevel[63] 10500
+#var herolevel[64] 11000
+#var herolevel[65] 11500
+#var herolevel[66] 12000
+#var herolevel[67] 12500
+#var herolevel[68] 13000
+#var herolevel[69] 13500
+#var herolevel[70] 14000
+#var herolevel[71] 14400
+#var herolevel[72] 14800
+#var herolevel[73] 15200
+#var herolevel[74] 15600
+#var herolevel[75] 16000
+#var herolevel[76] 16400
+#var herolevel[77] 16800
+#var herolevel[78] 17200
+#var herolevel[79] 17600
+#var herolevel[80] 18000
+#var herolevel[81] 18400
+#var herolevel[82] 18800
+#var herolevel[83] 19200
+#var herolevel[84] 19600
+#var herolevel[85] 20000
+#var herolevel[86] 20400
+#var herolevel[87] 20800
+#var herolevel[88] 21200
+#var herolevel[89] 21600
+#var herolevel[90] 22000
+#var herolevel[91] 22400
+#var herolevel[92] 22800
+#var herolevel[93] 23200
+#var herolevel[94] 23600
+#var herolevel[95] 24000
+#var herolevel[96] 24300
+#var herolevel[97] 24600
+#var herolevel[98] 24900
+#var herolevel[99] 25200
+#var herolevel[100] 25500
+#var goldlevel[1] 0
+#var goldlevel[2] 0
+#var goldlevel[3] 0
+#var goldlevel[4] 0
+#var goldlevel[5] 0
+#var goldlevel[6] 0
+#var goldlevel[7] 0
+#var goldlevel[8] 0
+#var goldlevel[9] 0
+#var goldlevel[10] 0
+#var goldlevel[11] 0
+#var goldlevel[12] 0
+#var goldlevel[13] 0
+#var goldlevel[14] 0
+#var goldlevel[15] 0
+#var goldlevel[16] 0
+#var goldlevel[17] 0
+#var goldlevel[18] 0
+#var goldlevel[19] 0
+#var goldlevel[20] 0
+#var goldlevel[21] 0
+#var goldlevel[22] 0
+#var goldlevel[23] 0
+#var goldlevel[24] 0
+#var goldlevel[25] 0
+#var goldlevel[26] 0
+#var goldlevel[27] 0
+#var goldlevel[28] 0
+#var goldlevel[29] 0
+#var goldlevel[30] 0
+#var goldlevel[31] 0
+#var goldlevel[32] 0
+#var goldlevel[33] 0
+#var goldlevel[34] 0
+#var goldlevel[35] 0
+#var goldlevel[36] 0
+#var goldlevel[37] 0
+#var goldlevel[38] 0
+#var goldlevel[39] 0
+#var goldlevel[40] 0
+#var goldlevel[41] 0
+#var goldlevel[42] 0
+#var goldlevel[43] 0
+#var goldlevel[44] 0
+#var goldlevel[45] 0
+#var goldlevel[46] 0
+#var goldlevel[47] 0
+#var goldlevel[48] 0
+#var goldlevel[49] 0
+#var goldlevel[50] 0
+#var goldlevel[51] 500000
+#var goldlevel[52] 535000
+#var goldlevel[53] 572000
+#var goldlevel[54] 609500
+#var goldlevel[55] 648000
+#var goldlevel[56] 687500
+#var goldlevel[57] 728000
+#var goldlevel[58] 769500
+#var goldlevel[59] 812000
+#var goldlevel[60] 915500
+#var goldlevel[61] 1022000
+#var goldlevel[62] 1131500
+#var goldlevel[63] 1244000
+#var goldlevel[64] 1359500
+#var goldlevel[65] 1478000
+#var goldlevel[66] 1599500
+#var goldlevel[67] 1724000
+#var goldlevel[68] 1851500
+#var goldlevel[69] 1982000
+#var goldlevel[70] 2115500
+#var goldlevel[71] 2252000
+#var goldlevel[72] 2391500
+#var goldlevel[73] 2534000
+#var goldlevel[74] 2679500
+#var goldlevel[75] 3535000
+#var goldlevel[76] 3609375
+#var goldlevel[77] 3685000
+#var goldlevel[78] 3761875
+#var goldlevel[79] 3840000
+#var goldlevel[80] 3919375
+#var goldlevel[81] 4000000
+#var goldlevel[82] 4081875
+#var goldlevel[83] 4165000
+#var goldlevel[84] 4249375
+#var goldlevel[85] 4335000
+#var goldlevel[86] 4421875
+#var goldlevel[87] 4510000
+#var goldlevel[88] 4599375
+#var goldlevel[89] 4690000
+#var goldlevel[90] 4781875
+#var goldlevel[91] 4875000
+#var goldlevel[92] 4969375
+#var goldlevel[93] 5065000
+#var goldlevel[94] 5161875
+#var goldlevel[95] 5260000
+#var goldlevel[96] 5359375
+#var goldlevel[97] 5460000
+#var goldlevel[98] 5561875
+#var goldlevel[99] 5665000
+#var goldlevel[100] 7864000
+
+
+#function {level_for_herps} {
+
+	#loop {100} {50} {_l} {
+		#if {%1 >= $herolevel[$_l]} {
+			#var result $_l;
+			#break
+		}
+	}
+}
+
+#sub {Hero Points: %1} {Herps:  <098>%1 [@level_for_herps{%1}]}
+
+#tab levelreq
+#alias {levelreq} {
+	#unvar endlevel;
+	#unvar startlevel;
+	#var exp_tmp 0;
+	#var gold_tmp 0;
+	#switch {"%2"} {
+		#case {""} {
+			#switch {"%1"} {
+				#case {""} {#showme <cfa> Usage: levelreq <'start level'> <'end level'>. You must enter at least one argument.};
+				#default {
+					#var endlevel %1;
+					#var startlevel $MSDP_LEVEL
+				}
+			}
+		};
+		#default {
+			#var endlevel %2;
+			#var startlevel %1
+		}
+	};
+
+	#if {&endlevel} {
+		#if {$endlevel<=$startlevel} {
+				#showme <cfa>End level must be greater than start level.
+			};
+		#elseif {$endlevel>$startlevel} {
+			#math _istart $startlevel+1;
+			#loop {$_istart} {$endlevel} {_i} {
+				#math exp_tmp {$exp_tmp+$explevel[$_i]};
+				#math gold_tmp {$gold_tmp+$goldlevel[$_i]}
+			};
+			#var gold_tmp @hNum{$gold_tmp};
+			#showme <cfa>From level '$startlevel' to '$endlevel' you need '@hNum{$exp_tmp}' exp, '$gold_tmp' gold and '$herolevel[$endlevel]' herps total.
+		};
+	}
+}
+
+#nop vim: syntax=tt
