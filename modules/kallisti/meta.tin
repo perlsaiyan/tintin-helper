@@ -1,0 +1,162 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var kallisti/meta-description {Meta assistance and advice}
+#var kallisti/autobuf-help {
+This module provides meta advice for every class.  It will suggest\n
+the optimal choice of h/m/s for the lowest cost for most hero points.\n
+\n
+It also adds a metaTotal command to add up your metas, and metaReport\n
+to endlessly disappoint you with how much xp and gold you've used.
+}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias kallisti/meta-register {
+	#if {@isloaded{queues}} {
+		register_module kallisti/meta
+	} {
+		fail_module kallisti/meta Need queues module
+	}
+}
+
+#var metaXPCost {}
+#var metaAUCost {}
+
+#var metaHero {}
+
+#list metaGains[Mage] create 3.5 5.5 3.5
+#list metaGains[Wizard] create 3.5 5.5 3.5
+#list metaGains[Necromancer] create 3.5 5.5 3.5
+
+#list metaGains[Priest] create 4 5 3.5
+#list metaGains[Templar] create 5 5 3
+#list metaGains[Druid] create 4 5 4
+#list metaGains[Prophet] create 3.5 6 3.5
+
+#list metaGains[Rogue] create 5.5 1.0 6.0
+#list metaGains[Assassin] create 5.5 1 6.5
+#list metaGains[Demoniac] create 4.5 3.5 5.0
+#list metaGains[Bard] create 4.5 3.5 5
+
+#list metaGains[Fighter] create 6.0 1.0 5.5
+#list metaGains[Barbarian] create 6.5 1.0 5.5
+#list metaGains[Ranger] create 5.5 2.0 5.5
+#list metaGains[Dreadlord] create 6.0 3.0 4.5
+#list metaGains[Paladin] create 6.0 3.0 4.5
+#list metaGains[Valkyrie] create 6.0 3.0 4.5
+
+#list metaGains[Monastic] create 5.0 2.5 5.0
+#list metaGains[Monk] create 5.0 3.0 5.0
+#list metaGains[Samurai] create 6.0 2.5 4.5
+
+#list metaHerosPer[Barbarian] create 2.45 0.1 1.65
+#list metaHerosPer[Paladin] create 2.3 1.5 1.3
+#list metaHerosPer[Dreadlord] create 2.3 1.5 1.3
+#list metaHerosPer[Ranger] create 2.3 1.3 1.5
+#list metaHerosPer[Fighter] create 2.45 0.10 1.65
+#list metaHerosPer[Valkyrie] create 2.3 1.5 1.3
+
+#list metaHerosPer[Rogue] create 2.40 0.10 1.70
+#list metaHerosPer[Assassin] create  2.4 0.1 1.7
+#list metaHerosPer[Demoniac] create 2.35 1.6 1.55
+#list metaHerosPer[Bard] create 2.1 1.7 1.5
+
+#list metaHerosPer[Priest] create 1.80 2.01 0.85
+#list metaHerosPer[Templar] create 2.0 2.2 1.0
+#list metaHerosPer[Druid] create 1.9 2.35 0.95
+#list metaHerosPer[Prophet] create 1.75 2.8 0.85
+
+#list metaHerosPer[Necromancer] create 1.75 2.8 0.8
+#list metaHerosPer[Wizard] create 1.75 2.8 0.8
+
+#list metaHerosPer[Monk] create 2.3 1.45 1.5
+#list metaHerosPer[Samurai] create 2.4 0.55 1.45
+
+
+
+#action {meta'd %1 to %2, cost = %3xp, %4gp} {
+	#math {metaExpTotal} {$metaExpTotal+%3};
+	#math {metaTotalGold} {$metaTotalGold+%4}
+}
+
+#tab metaTotal
+#alias {metaTotal} {
+	#var {metaExpTotal} {0};
+	#var {metaTotalGold} {0};
+	meta
+}
+
+#tab metaReport
+#alias {metaReport} {
+
+    #format {_line1} {<g23> Total exp Meta'd: <efc>%g} {$metaExpTotal};
+    #format {_line2} {<g23>Total gold Meta'd: <fea>%-15g} {$metaTotalGold};
+    #echo $_line1;
+    #echo $_line2;
+}
+
+#nop -- ---------------------------------------------------------------
+#nop -- Autometa functions
+#nop -- ---------------------------------------------------------------
+#func metaHeroHit {#math result {$metaGains[$MSDP_CLASS][1] * $metaHerosPer[$MSDP_CLASS][1]}}
+#func metaHeroMana {#math result {$metaGains[$MSDP_CLASS][2] * $metaHerosPer[$MSDP_CLASS][2]}}
+#func metaHeroStam {#math result {$metaGains[$MSDP_CLASS][3] * $metaHerosPer[$MSDP_CLASS][3]}}
+
+#act {^HitPoints             : {\d+} exp & {\d+} coins : Current {\d+}$} {
+    #var metaXPCost[hp] %1; #var metaAUCost[hp] %2;
+    #math {metaHero[hp]} { $metaXPCost[hp] / @metaHeroHit{} };
+    #format _tmp {<028>HitPoints             : <078>%s <028>exp & <078>%s <028>coins : Current <078>%d<028> (<078>%s<028>/hero)}
+        {@hNum{%1}} {@hNum{%2}} {%3} {@hNum{$metaHero[hp]}};
+    #showme $_tmp;
+    #line gag
+    }
+
+#act {^ManaPoints            : {\d+} exp & {\d+} coins : Current {\d+}$} {
+    #var metaXPCost[mana] %1; #var metaAUCost[mana] %2;
+    #math {metaHero[mana]} {$metaXPCost[mana] / @metaHeroMana{} };
+    #format _tmp {<028>ManaPoints            : <078>%s <028>exp & <078>%s <028>coins : Current <078>%d<028> (<078>%s<028>/hero)}
+        {@hNum{%1}} {@hNum{%2}} {%3} {@hNum{$metaHero[mana]}};
+    #showme $_tmp;
+    #line gag
+    }
+
+#act {^Stamina               : {\d+} exp & {\d+} coins : Current {\d+}$} {
+    #var metaXPCost[stam] %1; #var metaAUCost[stam] %2;
+    #math {metaHero[stam]} {$metaXPCost[stam] / @metaHeroStam{} };
+    #format _tmp {<028>Stamina               : <078>%s <028>exp & <078>%s <028>coins : Current <078>%d<028> (<078>%s<028>/hero)}
+        {@hNum{%1}} {@hNum{%2}} {%3} {@hNum{$metaHero[stam]}};
+    #showme $_tmp;
+    #line gag
+    }
+
+#act {^You can buy:} {#line oneshot #tick {meta advice} {show_meta_advice} {0.5}}
+
+#tab show_meta_advice
+#alias {show_meta_advice} {
+    #if { ($metaHero[hp] < $metaHero[stam]) & ($metaHero[hp] < $metaHero[mana])} {
+        #showme <f81a2b3>Meta HITPOINT for the most heros per experience point
+    };
+    #elseif { ($metaHero[mana] < $metaHero[hp]) & ($metaHero[mana] < $metaHero[stam])} {
+        #showme <f81a2b3>Meta MANA for the most heros per experience point
+    };
+    #elseif { ($metaHero[stam] < $metaHero[hp]) & ($metaHero[stam] < $metaHero[mana])} {
+        #showme <f81a2b3>Meta STAMINA for the most heros per experience point
+    };
+    #else {syslog meta warn Unable to provide meta advice, need meta values for this class.}
+}
+
+#action {^Meta %1 for the most heros per experience point} {
+	#if {"$autometa" != "on"} { #return; };
+    #switch {"%1"} {
+        #case {"HP"} {buy hit};
+        #case {"MANA"} {buy mana};
+        #case {"STAMINA"} {buy stam};
+    };
+}
+
+
+#nop -- vim: syntax=tt
