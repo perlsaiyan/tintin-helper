@@ -11,7 +11,8 @@
 
 #alias queues-register {
 	#if {@isloaded{modloader}} {
-		register_module queues
+		register_module queues;
+		queue_block
 	} {
 		fail_module queues unknown reason
 	}
@@ -25,7 +26,7 @@
     #if {$sindex} {
         info spell Not adding "%2" as it is already in list at position $sindex;
     }   {
-        info spell Adding spell "%2" to %1 queue;
+        info spell Adding command "%2" to %1 queue;
         #list _queue[%1] add {%2};
         queue_block
     };
@@ -38,7 +39,7 @@
     #if { @mpoch{} > $spellLock} {
         #if {&{_queue[priority][]}} {
             #if {@spell_can_cast{}} {
-                info spell Casting $_queue[priority][1];
+                info spell Executing $_queue[priority][1];
                 spell_cast_actual $_queue[priority][1];
                 #list {_queue[priority]} delete 1;
                 queue_block;
@@ -47,7 +48,7 @@
         };
         #if {&{_queue[heal][]}} {
             #if {@spell_can_cast{}} {
-                info spell Casting $_queue[heal][1];
+                info spell Executing $_queue[heal][1];
                 spell_cast_actual $_queue[heal][1];
                 #list {_queue[heal]} delete 1;
                 queue_block;
@@ -56,7 +57,7 @@
         };
         #if {&{_queue[any][]}} {
             #if {@spell_can_cast{}} {
-                info spell Casting $_queue[any][1];
+                info spell Executing $_queue[any][1];
                 spell_cast_actual $_queue[any][1];
                 #list {_queue[any]} delete 1;
                 queue_block;
@@ -66,7 +67,7 @@
         #if {&{_queue[combat][]}} {
             #if {"$MSDP_POSITION" == "Fighting"} {
                 #if {@spell_can_cast{}} {
-                    info spell Casting $_queue[combat][1];
+                    info spell Executing $_queue[combat][1];
                     spell_cast_actual $_queue[combat][1];
                     #list {_queue[combat]} delete 1;
                     queue_block;
@@ -80,9 +81,20 @@
         #if {&{_queue[nco][]}} {
             #if {"$MSDP_POSITION" != "Fighting"} {
                 #if {@spell_can_cast{}} {
-                    info spell Casting $_queue[nco][1];
+                    info spell Executing $_queue[nco][1];
                     spell_cast_actual $_queue[nco][1];
                     #list {_queue[nco]} delete 1;
+                    queue_block;
+                    #break
+                };
+            };
+        };
+        #if {&{_queue[move][]}} {
+            #if {"$MSDP_POSITION" != "Fighting"} {
+                #if {@spell_can_cast{}} {
+                    info spell Executing $_queue[move][1];
+                    spell_cast_actual $_queue[move][1];
+                    #list {_queue[move]} delete 1;
                     queue_block;
                     #break
                 };
@@ -101,13 +113,14 @@
 
 #alias {queue_block} {
 
-    #format {queue_block} {<388>%-39s<088>\nPriority: %d     Heal: %d     Any: %d\n  Combat: %d      NCO: %d}
+    #format {queue_block} {<388>%-39s<088>\nPriority: %d     Heal: %d     Any: %d\n  Combat: %d      NCO: %d    Move: %d}
     	{Action Queues}
-        &_queue[priority][]
-        &_queue[heal][]
-        &_queue[any][]
-        &_queue[combat][]
-        &_queue[nco][];
+        &{_queue}[priority][]
+        &{_queue}[heal][]
+        &{_queue}[any][]
+        &{_queue}[combat][]
+        &{_queue}[nco][]
+		&{_queue}[move][];
 
 	display_right_tiles
 }
