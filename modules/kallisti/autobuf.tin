@@ -1,0 +1,282 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var kallisti/autobuf-description {Handle character bufs automatically}
+#var kallisti/autobuf-help {
+Under construction.  Needs all on/off switches moved to the coming\n
+prefs module.
+}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias kallisti/autobuf-register {
+	#if {@isloaded{queues}} {
+		register_module kallisti/autobuf
+	} {
+		fail_module kallisti/autobuf Need queues module
+	}
+}
+
+#tick {auto bufs} {autoBuf} {4}
+
+#var lastSanct 0; #var sanctDelay 15;
+#var lastGuardian 0; #var guardianDelay 15; #var autoGuardian off;
+#var lastBlade 0; #var bladeDelay 15;
+#var lastDArmor 0; #var darmorDelay 15;
+#var lastDShield 0; #var dshieldDelay 15;
+#var lastBark 0; #var barkDelay 15; #var autobark on;
+#var lastBless 0; #var blessDelay 15; #var autobless off;
+#var lastStatic 0; #var staticDelay 15; #var autostatic on;
+#var lastAura 0; #var auraDelay 15; #var autoaura on;
+#var lastGrim 0; #var grimDelay 15; #var autogrim on;
+#var lastFFire 0; #var ffireDelay 15;
+#var lastVig 0; 
+#var lastWarcry 0
+
+init sanctMethod autobuf auto;
+
+#alias autoBuf {
+
+    #if {@hasAffect{haste} < 1} {
+        #switch {"$MSDP_CLASS"} {
+            #case {"Wizard"} {doHasteSpell};
+        }
+    };
+
+    #if {@hasAffect{warcry} < 1} {doWarcry};
+    #if {@hasAffect{true seeing} < 1} {doTruesee};
+    #if {@hasAffect{spiritual guardian} < 1} {doSpiritGuardian};
+    #if {@hasAffect{divine shield} < 1} {doDivineShield};
+    #if {@hasAffect{blade barrier} < 1} {doBladeBarrier};
+    #if {@hasAffect{faerie fire} < 1} {doFFire};
+    #if {@hasAffect{static field} < 1} {doStaticField};
+    #if {@hasAffect{grim ward} < 1} {doGrimWard};
+
+    #if {@hasAffect{unholy aura} < 2} {doUnholyAura};
+    #if {@hasAffect{shapechange} < 2} {doShapechange};
+    #if {@hasAffect{sanctuary} < 2} {doSanctuary};
+    #if {@hasAffect{divine armor} < 2} {doDivineArmor};
+    #if {@hasAffect{vigor} < 2} {doVigor};
+    #if {@hasAffect{barkskin} < 2} {doBarkskin};
+    #if {@hasAffect{bless} < 2} {doBless};
+
+}
+
+#alias doTruesee {
+    #switch {"$MSDP_CLASS"} {
+        #case {"Prophet"} {queueAdd nco {true}};
+        #case {"Druid"} {queueAdd nco {true}};
+        #case {"Templar"} {queueAdd nco {true}};
+    };
+}
+
+
+#alias doWarcry {
+    #if { "$MSDP_CLASS" == "Barbarian" } { queueAdd any {warcry} }
+}
+
+#alias doHasteSpell {
+    #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
+        #if {$MSDP_MANA > 160} {queueAdd nco {haste group}}
+    } {
+        #if {$MSDP_MANA > 40}  {queueAdd nco {haste}}
+    }
+}
+
+#alias doDivineArmor {
+    #if { ( @epoch{} - $darmorDelay ) < $lastDArmor } { #return } { #var lastDArmor @epoch{}};
+
+    #if { ("$MSDP_CLASS" == "Templar") || ("$MSDP_CLASS" == "Prophet") } {
+        #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
+            #if {$MSDP_MANA > 160} {queueAdd nco {darmor group}}
+        } {
+            #if {$MSDP_MANA > 40}  {queueAdd nco {darmor}}
+        }
+    }
+}
+#alias doDivineShield {
+    #if { ( @epoch{} - $dshieldDelay ) < $lastDShield } { #return } { #var lastDShield @epoch{}};
+
+    #if { ("$MSDP_CLASS" == "Templar")  } {
+            #if {$MSDP_MANA > 160} {queueAdd nco {dshield}}
+    }
+}
+#alias doSpiritGuardian {
+    #if { ( @epoch{} - $guardianDelay ) < $lastGuardian } { #return };
+    #if { "$autoGuardian" == "off" } {#return};
+
+    #if { ("$MSDP_CLASS" == "Templar") || ( "$MSDP_CLASS" == "Prophet") } {
+        #if {$MSDP_MANA > 40}  {queueAdd nco {spirit}};
+        #var lastGuardian @epoch{}
+    }
+}
+#alias doBladeBarrier {
+    #if { ( @epoch{} - $bladeDelay ) < $lastBlade } { #return };
+
+    #if {"$MSDP_CLASS" == "Templar"} {
+        #if {$MSDP_MANA > 40}  {queueAdd nco {blade}};
+        #var lastBlade @epoch{}
+    }
+}
+
+#alias doVigor {
+    #if {@epoch{} < ( $lastVig + 15) } { #return 1 };
+    #var lastVig @epoch{};
+    #if { "$autovigor" == "on" } {
+        #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
+            #if {$MSDP_MANA > 100} {queueAdd nco {vigor group}}
+        } {
+            #if {$MSDP_MANA > 40}  {queueAdd nco {vigor}}
+        }
+    }
+}
+
+#alias doBarkskin {
+	#switch {"$MSDP_CLASS"} {
+		#case {"Druid"} {
+			#if { (@epoch{} - $lastBark < $barkDelay) } { #return 1 } {#var lastBark @epoch{}};
+			#if { ("$autobark" == "on") } {
+				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
+					#if {$MSDP_MANA > 100} {queueAdd nco {barkskin group}}
+				} {
+					#if {$MSDP_MANA > 40}  {queueAdd nco {barkskin}}
+				}
+			}
+		};
+	}
+}
+#alias doStaticField {
+	#switch {"$MSDP_CLASS"} {
+		#case {"Wizard"} {
+			#if { (@epoch{} - $lastStatic < $staticDelay) } { #return 1 } {#var lastStatic @epoch{}};
+			#if { ("$autostatic" == "on") } {
+				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
+					#if {$MSDP_MANA > 100} {queueAdd nco {static group}}
+				} {
+					#if {$MSDP_MANA > 40}  {queueAdd nco {static}}
+				}
+			}
+		};
+	}
+}
+#alias doUnholyAura {
+	#switch {"$MSDP_CLASS"} {
+		#case {"Dreadlord"} {
+			#if { (@epoch{} - $lastAura < $auraDelay) } { #return 1 } {#var lastAura @epoch{}};
+			#if { ("$autoaura" == "on") } {
+				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 9) } {
+					#if {$MSDP_MANA > 100} {queueAdd nco {aura group}}
+				} {
+					#if {$MSDP_MANA > 40}  {queueAdd nco {aura}}
+				}
+			}
+		};
+		#case {"Necromancer"} {
+			#if { (@epoch{} - $lastAura < $auraDelay) } { #return 1 } {#var lastAura @epoch{}};
+			#if { ("$autoaura" == "on") } {
+				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 2) } {
+					#if {$MSDP_MANA > 100} {queueAdd nco {aura group}}
+				} {
+					#if {$MSDP_MANA > 40}  {queueAdd nco {aura}}
+				}
+			}
+		};
+	}
+}
+#alias doGrimWard {
+	#switch {"$MSDP_CLASS"} {
+		#case {"Necromancer"} {
+			#if { (@epoch{} - $lastGrim < $grimDelay) } { #return 1 } {#var lastGrim @epoch{}};
+			#if { ("$autogrim" == "on") } {
+				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 2) } {
+					#if {$MSDP_MANA > 100} {queueAdd nco {grimw group}}
+				} {
+					#if {$MSDP_MANA > 40}  {queueAdd nco {grimw}}
+				}
+			}
+		};
+	}
+}
+
+#alias doFFire {
+	#switch {"$MSDP_CLASS"} {
+		#case {"Druid"} {
+			#if { (@epoch{} - $lastFFire < $ffireDelay) } { #return 1 } {#var lastFFire @epoch{}};
+				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
+					#if {$MSDP_MANA > 100} {queueAdd nco {ffire group}}
+				} {
+					#if {$MSDP_MANA > 40}  {queueAdd nco {ffire}}
+				}
+		};
+	}
+}
+
+#alias doSanctuary {
+
+    #if { (@epoch{} - $sanctDelay ) > $lastSanct } {
+        #switch {"$sanctMethod"} {
+			#case {"none"} {#nop};
+            #case {"potion"} {queueAdd nco {sanctPotion}};
+            #case {"gsanc"} {queueAdd nco {gt gsanc}};
+            #case {"spell"} {doSpellSanct};
+            #default {queueAdd nco {doSmartSanct}};
+        };
+        #var lastSanct @epoch{}
+    } {
+        debug autobuf Not rerequesting sanct for $sanctDelay seconds.
+    }
+}
+
+#alias doSpellSanct {
+    #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
+        #if {$MSDP_MANA > 160} {queueAdd nco {sanct group}}
+    } {
+        #if {$MSDP_MANA > 40}  {queueAdd nco {sanct}}
+    }
+}
+
+#alias doSmartSanct {
+
+    #if {@groupIsPresent{Donal} == 1 } {queueAdd nco {gt gsanc}};
+    #elseif {@groupIsPresent{Ujarak} == 1 } {queueAdd nco {gt all sanct group}};
+    #elseif { "$MSDP_CLASS" == "Prophet" } { doSpellSanct };
+    #elseif { "$MSDP_CLASS" == "Templar" } { doSpellSanct };
+    #elseif {@groupIsPresent{Ariella} == 1 } {queueAdd nco {gt sanc group}};
+    #else {sanctPotion};
+
+}
+
+#alias doBless {
+	#switch {"$MSDP_CLASS"} {
+		#case {"Druid"} {
+			#if { (@epoch{} - $lastBless < $blessDelay) } { #return 1 } {#var lastBless @epoch{}};
+			#if { ("$autobark" == "on") } {
+				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
+					#if {$MSDP_MANA > 100} {queueAdd nco {bless}}
+				} {
+					#if {$MSDP_MANA > 40}  {queueAdd nco {bless}}
+				}
+			}
+		};
+	}
+}
+#alias sanctPotion {pg purple;quaff purple};
+
+#alias doShapechange {
+    #if {"${pref_shapechange}" == "werewolf"} {
+        queueAdd nco {werewolf}
+    };
+    #elseif {&{pref_shapechange}} {
+		#switch {"$MSDP_CLASS"} {
+			#case {"Druid"} {queueAdd nco {shapechange $pref_shapechange}};
+			#case {"Necromancer"} {queueAdd nco {mortify $pref_shapechange}};
+		};
+    };
+};
+
+
+#class autobuf close
+#nop -- vim: syntax=tt
