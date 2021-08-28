@@ -10,6 +10,8 @@ Current layout: ${layout_preference}\n
 \n
 Commands:\n
 \tlayout <choice> - set preference or show layout options\n
+\tset_right_tile <color> <content> <height> <tile|box>\n
+\tset_left_tile <color> <content> <height> <tile|box>\n
 }
 
 #nop --
