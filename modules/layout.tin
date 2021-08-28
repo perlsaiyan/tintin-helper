@@ -28,9 +28,8 @@ Commands:\n
 #tab layout;
 
 #list valid_layouts create {full} {right} {simple};
-
-	
-
+#alias layout_init { #nop } {9}
+#alias layout_reset {layout_init;#nop %0}
 
 #alias layout {
 	#if {"%1" == ""} {
@@ -55,13 +54,13 @@ Commands:\n
 	};
 }
 
-#alias layout_reset {layout_init;#nop %0}
-
-#if {&{layout_preference}} {
-	layout ${layout_preference}
-} {
-	layout simple
+#alias {set_right_tile %1 %2 %3 %4 %5} {
+	#var right_tiles[%1] {{color}{%2}{content}{%3}{height}{%4}{type}{%5}}
 }
+#alias {set_left_tile %1 %2 %3 %4 %5} {
+	#var left_tiles[%1] {{color}{%2}{content}{%3}{height}{%4}{type}{%5}}
+}
+
 
 #event {SCREEN RESIZE} { layout_init };
 #event {VARIABLE UPDATED layout_preference} { layout_init };
@@ -73,14 +72,13 @@ event_register {SESSION ACTIVATED} {layout} {layout_reset %1}
 #nop -- already exist;
 
 #if {!&{right_tiles}} {
-	#var right_tiles[1][height] 2;
-	#var right_tiles[1][type] tile;
-	#var right_tiles[1][color] <B5f819d>;
-	#var right_tiles[1][content] area_info;
-	#var right_tiles[2][height] 10;
-	#var right_tiles[2][type] tile;
-	#var right_tiles[2][color] <B85678f>;
-	#var right_tiles[2][content] group_info[%*];
+	set_right_tile 1 <B5f819d> area_info 2 tile;
+	set_right_tile 2 <B85678f> group_info[%*] 10 tile;
+	set_right_tile 3 <B5f819d> queue_block 3 tile;
 }
+
+#nop Let's set up something to at least have a layout
+init layout_preference layout simple;
+layout ${layout_preference};
 
 #nop -- vim: syntax=tt
