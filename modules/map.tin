@@ -109,7 +109,7 @@
 #nop -- ---------------------------------------------------------------
 #nop -- Events
 #nop -- ---------------------------------------------------------------
-#nop #event {SESSION DISCONNECTED} {#map write $db/msdp.map}
+#event {SESSION DISCONNECTED} {#map write $db/msdp.map}
 
 
 #nop -- ---------------------------------------------------------------
