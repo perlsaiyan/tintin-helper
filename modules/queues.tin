@@ -2,8 +2,19 @@
 #nop Class Definitions
 #nop --
 
-#var queues-description {description}
-#var queues-help {help file}
+#var queues-description {Action queues}
+#var queues-help {
+A command queueing system with priorities.\n
+\n
+To use, run queueAdd <priority> <command>.\n
+\n
+Valid queues in order of execution are:\n
+priority, heal, any (executes at any time), combat (executes if in combat),\n
+nco (non-combat operation), and move.\n
+\n
+There is a shortcut command for NCO (nco <command>).\n
+Combat queues clear at the end of combat automatically.\n
+}
 
 #nop --
 #nop Modloader Stuff
@@ -21,7 +32,7 @@
 
 #list spellValidPositions create Flying Fighting Mounted Standing Swimming;
 
-#alias queueAdd {
+#alias {queueAdd %1 %2} {
     #list _queue[%1] find {%2} {sindex};
     #if {$sindex} {
         info spell Not adding "%2" as it is already in list at position $sindex;
@@ -151,6 +162,7 @@
         #case {"get"} #var result 500;
         #case {"drop"} #var result 500;
         #case {"harvest"} #var result 0;
+        #case {"extract"} #var result 3000;
         #default {
             #var result 2000;
             info spell Unknown delay for %1, using $result ms
