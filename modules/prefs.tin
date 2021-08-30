@@ -1,0 +1,67 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var prefs-description {Persistent preferences}
+#var prefs-help {
+Maintains persistent preference choices.\n
+Usage:\n
+\tshow_prefs - Show all preferences\n
+\tpref <setting> <value>\n
+}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias prefs-register {
+	#if {@isloaded{modloader}} {
+		register_module prefs
+	} {
+		fail_module prefs unknown reason
+	}
+}
+
+#nop pref with no argument gives us all of our preferences
+#alias {^pref$} {
+    #showme <188>All Preferences<088>;
+    event_raise {show preferences}
+} {1}
+
+#nop pref with a single argument is the lowest priority (highest value)
+#alias {^pref %1} {
+    event_raise {show preferences} {%1}
+} {9}
+
+#nop pref with two arguments is wanting to set options
+#alias {^pref %1 %2} {
+    #nop initialize a handler requested flag;
+    #class prefs assign #var _pref_set_request 1;
+    event_raise {set preferences} {%1} {%2};
+    #if {$_pref_set_request == 1} {
+        warn No handler for %1, I'm afraid.
+    }
+
+}
+
+#alias {pref_handled} {#var _pref_set_request 2}
+
+#alias _preference_save {
+    #if {&preference_file} {
+        #class preferences write $db/$preference_file;
+    } {
+        warn No preference file available (#var preference_file)
+    }
+}
+
+
+#nop -- Initialization routines
+#if {!&{preference_file}} {
+    #info session save;
+    init preference_file prefs $info[SESSION][NAME];
+}
+
+#class preferences read $db/$preference_file;
+
+
+#nop vim: syntax=tt

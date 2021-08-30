@@ -36,8 +36,24 @@ prefs module.
 #var lastVig 0; 
 #var lastWarcry 0
 
-init sanctMethod autobuf auto;
+init sanctMethod preferences auto;
+event_register {show preferences} {kallisti/autobuf} {autobuf_preferences};
+event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences}; 
 
+#alias autobuf_preferences {
+    #nop %0;
+    #if {("%2" == "autobuf") || ("%2" == "")} {
+        #showme <afc>Autobuf;
+        #format line {<caf>%%10s: <fac>%%10s} {sanctmethod} {$sanctMethod};
+        #showme $line
+    }
+}
+
+#alias autobuf_set_preferences {
+    #switch {"%2"} {
+        #case {"autobuf"} { #showme yeah, set %3 to whatever.; pref_handled }
+    }
+}
 #alias autoBuf {
 
     #if {@hasAffect{haste} < 1} {
@@ -63,6 +79,11 @@ init sanctMethod autobuf auto;
     #if {@hasAffect{barkskin} < 2} {doBarkskin};
     #if {@hasAffect{bless} < 2} {doBless};
 
+    #foreach {*MSDP_AFFECTS[%*]} {tmp} {
+        #if {@hasAffect{$tmp} <= 1} {
+            warn autobuf $tmp at $MSDP_AFFECTS[$tmp] duration
+        }
+    }
 }
 
 #alias doTruesee {
