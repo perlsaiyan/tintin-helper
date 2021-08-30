@@ -22,8 +22,15 @@ init _last_xp odometer ${MSDP_EXPERIENCE};
 	#showme Average xp over last &{_meter[XP][]} ticks: ${_avg};
 }
 
+#tab odometer_reset
+#alias odometer_reset {
+	#unvar _meter[XP];
+	#var _last_xp ${MSDP_EXPERIENCE};
+	update_xp_block
+}
+
 #alias update_xp_block {
-	#var xp_block {XP/hr: @avg_xp_per_hour{}}
+	#var xp_block {XP/hr: <188>@avg_xp_per_hour{}<088><F5f819d> over <188>&_meter[XP][%*]<088><F5f819d> ticks}
 }
 
 #function avg_xp_per_hour {
@@ -35,6 +42,6 @@ init _last_xp odometer ${MSDP_EXPERIENCE};
 	#var result @hNum{$result}
 }
 
-set_right_tile 4 <B5f819d> xp_block 1 tile
+set_right_tile 4 <F5f819d> xp_block 1 tile
 
 #nop vim: syntax=tt
