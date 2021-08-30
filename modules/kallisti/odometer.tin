@@ -3,14 +3,16 @@
 #nop --
 
 event_register {variable MSDP_WORLD_TIME} {odometer} {odometer};
-#var _last_xp ${MSDP_EXPERIENCE};
+init _last_xp odometer ${MSDP_EXPERIENCE};
 
 #alias odometer {
 	#nop %0;
 	#math {_meter[XP][${MSDP_WORLD_TIME}]} {${MSDP_EXPERIENCE} - ${_last_xp}};
 	#var _last_xp ${MSDP_EXPERIENCE};
+	update_xp_block
 }
 
+#tab show_xp
 #alias show_xp {
 	#var _total 0;
 	#foreach {${_meter[XP][%*]}} {tmp}  {
@@ -20,5 +22,19 @@ event_register {variable MSDP_WORLD_TIME} {odometer} {odometer};
 	#showme Average xp over last &{_meter[XP][]} ticks: ${_avg};
 }
 
+#alias update_xp_block {
+	#var xp_block {XP/hr: @avg_xp_per_hour{}}
+}
+
+#function avg_xp_per_hour {
+	#var _total 0;
+	#foreach {${_meter[XP][%*]}} {tmp}  {
+		#math {_total} {${_total} + ${tmp}}
+	};
+	#math {result} {48 * (1.00 *${_total}) / &{_meter[XP][]}};
+	#var result @hNum{$result}
+}
+
+set_right_tile 4 <B5f819d> xp_block 1 tile
 
 #nop vim: syntax=tt

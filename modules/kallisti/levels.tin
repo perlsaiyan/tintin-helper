@@ -370,7 +370,7 @@ Usage: levelreq <startlevel> <endlevel>}
 				#math gold_tmp {$gold_tmp+$goldlevel[$_i]}
 			};
 			#var gold_tmp @hNum{$gold_tmp};
-			#showme <cfa>From level '$startlevel' to '$endlevel' you need '@hNum{$exp_tmp}' exp, '$gold_tmp' gold and '$herolevel[$endlevel]' herps total.
+			#showme <cfa>From level '$startlevel' to '$endlevel' you need '@hNum{$exp_tmp}' exp, '$gold_tmp' gold and '$herolevel[$endlevel]' hero points total.
 		};
 	}
 }
