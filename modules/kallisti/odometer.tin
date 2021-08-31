@@ -20,6 +20,8 @@ You can use the odometer_reset command to reset the XP counters.
 }
 
 event_register {variable MSDP_WORLD_TIME} {odometer} {odometer};
+event_register {variable MSDP_UPTIME} {odometer} {odometer_uptime};
+
 init _last_xp odometer ${MSDP_EXPERIENCE};
 
 #alias odometer {
@@ -46,6 +48,18 @@ init _last_xp odometer ${MSDP_EXPERIENCE};
 	update_xp_block
 }
 
+#alias odometer_uptime {
+	#nop %0;
+	#var uptime_seconds $MSDP_UPTIME;
+	#math uptime_minutes {$uptime_seconds / 60};
+	#math uptime_seconds {$uptime_seconds % 60};
+	#math uptime_hours {$uptime_minutes / 60};
+	#math uptime_minutes {$uptime_minutes % 60};
+	#math uptime_days {$uptime_hours / 24};
+	#math uptime_hours {$uptime_hours % 24};
+	#var uptime_block {Up: <188>$uptime_days days, $uptime_hours hours, $uptime_minutes minutes<088>}
+}
+
 #alias update_xp_block {
 	#var xp_block {XP/hr: <188>@avg_xp_per_hour{}<088><F5f819d> over <188>&_meter[XP][%*]<088><F5f819d> ticks}
 }
@@ -59,6 +73,7 @@ init _last_xp odometer ${MSDP_EXPERIENCE};
 	#var result @hNum{$result}
 }
 
-set_right_tile 4 <F5f819d> xp_block 1 tile
+set_right_tile 4 <F5f819d> xp_block 1 tile;
+set_right_tile 5 <F5f819d> uptime_block 1 tile
 
 #nop vim: syntax=tt
