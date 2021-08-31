@@ -61,7 +61,13 @@ init _last_xp odometer ${MSDP_EXPERIENCE};
 }
 
 #alias update_xp_block {
-	#var xp_block {XP/hr: <188>@avg_xp_per_hour{}<088><F5f819d> over <188>&_meter[XP][%*]<088><F5f819d> ticks}
+	#var xp_block {XP/hr: <188>@avg_xp_per_hour{}<088><F5f819d> over <188>&_meter[XP][%*]<088><F5f819d> ticks};
+	#if {$MSDP_EXPERIENCE_TNL > 0} {
+		#math _ttl {($MSDP_EXPERIENCE_TNL / @avg_xp{}) * 75/60};
+		#var xp_block {$xp_block\nApprox. $_ttl mins to level}
+	} {
+		#var xp_block {$xp_block\nGO LEVEL!}
+	}
 }
 
 #function avg_xp_per_hour {
@@ -73,7 +79,14 @@ init _last_xp odometer ${MSDP_EXPERIENCE};
 	#var result @hNum{$result}
 }
 
-set_right_tile 4 <F5f819d> xp_block 1 tile;
+#func avg_xp {
+	#var _total 0;
+	#foreach {${_meter[XP][%*]}} {tmp}  {
+		#math {_total} {${_total} + ${tmp}}
+	};
+	#math {result} {(1.00 *${_total}) / &{_meter[XP][]}};
+}
+set_right_tile 4 <F5f819d> xp_block 2 tile;
 set_right_tile 5 <F5f819d> uptime_block 1 tile
 
 #nop vim: syntax=tt
