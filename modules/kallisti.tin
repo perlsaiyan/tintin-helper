@@ -73,13 +73,15 @@ event_register {variable MSDP_GROUP} {right} {generate_group_info {%0} {%1} {%2}
     	#list group_info create {<Ffff>Group (level ${MSDP_GROUPLEVEL})};
 	};
     #foreach *MSDP_GROUP[%*] {_idx} {
+		#var _flags $MSDP_GROUP[$_idx][flags];
+		#replace {_flags} {[ranged]} {>};
         #format _line {<ffff>%-5s %-10.9s %-3s %-3s %-3s <ffff>%-4s}
             {@withMe{$_idx}[$MSDP_GROUP[$_idx][class]]}
             {$MSDP_GROUP[$_idx][name]}
             {@colorPct{$MSDP_GROUP[$_idx][health]}}
             {@colorPct{$MSDP_GROUP[$_idx][mana]}}
             {@colorPct{$MSDP_GROUP[$_idx][stamina]}}
-            {$MSDP_GROUP[$_idx][flags]};
+            {$_flags};
              #list group_info add {{$_line}};
     };
     #if {@isloaded{layout}} {display_right_tiles}
@@ -94,5 +96,6 @@ event_register {variable MSDP_GROUP} {right} {generate_group_info {%0} {%1} {%2}
 #nop -- generate_area_info;
 #nop -- generate_group_info;
 
+#tick {idle} {#cr} {30}
 
 #nop vim: syntax=tt

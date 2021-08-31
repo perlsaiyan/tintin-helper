@@ -152,7 +152,7 @@ to endlessly disappoint you with how much xp and gold you've used.
 #action {^Meta %1 for the most heros per experience point} {
 	#if {"$autometa" != "on"} { #return; };
     #switch {"%1"} {
-        #case {"HP"} {buy hit};
+        #case {"HITPOINT"} {buy hit};
         #case {"MANA"} {buy mana};
         #case {"STAMINA"} {buy stam};
     };
