@@ -46,7 +46,7 @@ Usage:\n
 
 #alias {pref_handled} {#var _pref_set_request 2}
 
-#alias _preference_save {
+#alias _preferences_save {
     #if {&preference_file} {
         #class preferences write $db/$preference_file;
     } {

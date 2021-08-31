@@ -2,6 +2,23 @@
 #nop Class Definitions
 #nop --
 
+#var kallisti/odometer-description {Measures various performance metrics}
+#var kallisti/odometer-help {
+You can use the odometer_reset command to reset the XP counters.
+}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias kallisti/odometer-register {
+	#if {@isloaded{events}} {
+		register_module kallisti/odometer
+	} {
+		fail_module kallisti/odometer Module 'events' not loaded
+	}
+}
+
 event_register {variable MSDP_WORLD_TIME} {odometer} {odometer};
 init _last_xp odometer ${MSDP_EXPERIENCE};
 

@@ -22,21 +22,14 @@ prefs module.
 
 #tick {auto bufs} {autoBuf} {4}
 
-#var lastSanct 0; #var sanctDelay 15;
-#var lastGuardian 0; #var guardianDelay 15; #var autoGuardian off;
-#var lastBlade 0; #var bladeDelay 15;
-#var lastDArmor 0; #var darmorDelay 15;
-#var lastDShield 0; #var dshieldDelay 15;
-#var lastBark 0; #var barkDelay 15; #var autobark on;
-#var lastBless 0; #var blessDelay 15; #var autobless off;
-#var lastStatic 0; #var staticDelay 15; #var autostatic on;
-#var lastAura 0; #var auraDelay 15; #var autoaura on;
-#var lastGrim 0; #var grimDelay 15; #var autogrim on;
-#var lastFFire 0; #var ffireDelay 15;
-#var lastVig 0; 
-#var lastWarcry 0
+#var autobuf_delay 15;
 
+#nop -- Preference Management --
 init sanctMethod preferences auto;
+#foreach {autoguardian;autobark;autostatic;autoaura;autogrim;autodshield} {tmp} {
+    init $tmp preferences off;
+}
+
 event_register {show preferences} {kallisti/autobuf} {autobuf_preferences};
 event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences}; 
 
@@ -54,6 +47,8 @@ event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences};
         #case {"autobuf"} { #showme yeah, set %3 to whatever.; pref_handled }
     }
 }
+#nop -- End Preference Management--
+
 #alias autoBuf {
 
     #if {@hasAffect{haste} < 1} {
@@ -62,6 +57,7 @@ event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences};
         }
     };
 
+    #nop -- Affects that must exhaust completely;
     #if {@hasAffect{warcry} < 1} {doWarcry};
     #if {@hasAffect{true seeing} < 1} {doTruesee};
     #if {@hasAffect{spiritual guardian} < 1} {doSpiritGuardian};
@@ -71,6 +67,7 @@ event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences};
     #if {@hasAffect{static field} < 1} {doStaticField};
     #if {@hasAffect{grim ward} < 1} {doGrimWard};
 
+    #nop -- Affects we can renew during the last tick;
     #if {@hasAffect{unholy aura} < 2} {doUnholyAura};
     #if {@hasAffect{shapechange} < 2} {doShapechange};
     #if {@hasAffect{sanctuary} < 2} {doSanctuary};
@@ -108,45 +105,43 @@ event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences};
 }
 
 #alias doDivineArmor {
-    #if { ( @epoch{} - $darmorDelay ) < $lastDArmor } { #return } { #var lastDArmor @epoch{}};
-
-    #if { ("$MSDP_CLASS" == "Templar") || ("$MSDP_CLASS" == "Prophet") } {
-        #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
-            #if {$MSDP_MANA > 160} {queueAdd nco {darmor group}}
-        } {
-            #if {$MSDP_MANA > 40}  {queueAdd nco {darmor}}
+    #if {@autobuf_check{darmor} && ("$autodarmor" == "on"} {
+        #if { ("$MSDP_CLASS" == "Templar") || ("$MSDP_CLASS" == "Prophet") } {
+            #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
+                #if {$MSDP_MANA > 160} {queueAdd nco {darmor group}}
+            } {
+                #if {$MSDP_MANA > 40}  {queueAdd nco {darmor}}
+            }
         }
     }
 }
-#alias doDivineShield {
-    #if { ( @epoch{} - $dshieldDelay ) < $lastDShield } { #return } { #var lastDShield @epoch{}};
 
-    #if { ("$MSDP_CLASS" == "Templar")  } {
-            #if {$MSDP_MANA > 160} {queueAdd nco {dshield}}
+#alias doDivineShield {
+    #if {@autobuf_check{dshield} && ("$autodshield" == "on")} {
+        #switch {"$MSDP_CLASS"} {
+            #case {"Templar"} {#if {$MSDP_MANA > 160} {queueAdd nco {dshield}}};
+            #default {warn autobuf Divine Shield preference is on but you are class $MSDP_CLASS}
+        }
     }
 }
-#alias doSpiritGuardian {
-    #if { ( @epoch{} - $guardianDelay ) < $lastGuardian } { #return };
-    #if { "$autoGuardian" == "off" } {#return};
 
-    #if { ("$MSDP_CLASS" == "Templar") || ( "$MSDP_CLASS" == "Prophet") } {
-        #if {$MSDP_MANA > 40}  {queueAdd nco {spirit}};
-        #var lastGuardian @epoch{}
+#alias doSpiritGuardian {
+    #if {@autobuf_check{guardian} && ("$autoguardian" == "on"} {
+        #if { ("$MSDP_CLASS" == "Templar") || ( "$MSDP_CLASS" == "Prophet") } {
+            #if {$MSDP_MANA > 40}  {queueAdd nco {spirit}};
+        }
     }
 }
 #alias doBladeBarrier {
-    #if { ( @epoch{} - $bladeDelay ) < $lastBlade } { #return };
-
-    #if {"$MSDP_CLASS" == "Templar"} {
-        #if {$MSDP_MANA > 40}  {queueAdd nco {blade}};
-        #var lastBlade @epoch{}
+    #if {@autobuf_check{blade barrier} && ("$autoblade" == "on")} {
+        #if {"$MSDP_CLASS" == "Templar"} {
+            #if {$MSDP_MANA > 40}  {queueAdd nco {blade}};
+        }
     }
 }
 
 #alias doVigor {
-    #if {@epoch{} < ( $lastVig + 15) } { #return 1 };
-    #var lastVig @epoch{};
-    #if { "$autovigor" == "on" } {
+    #if {@autobuf_check{vigor} && ("$autovigor" == "on")} {
         #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
             #if {$MSDP_MANA > 100} {queueAdd nco {vigor group}}
         } {
@@ -156,10 +151,9 @@ event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences};
 }
 
 #alias doBarkskin {
-	#switch {"$MSDP_CLASS"} {
-		#case {"Druid"} {
-			#if { (@epoch{} - $lastBark < $barkDelay) } { #return 1 } {#var lastBark @epoch{}};
-			#if { ("$autobark" == "on") } {
+    #if {(@autobuf_check{barkskin}) && ("$autobark" == "on")} {
+	    #switch {"$MSDP_CLASS"} {
+		    #case {"Druid"} {
 				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
 					#if {$MSDP_MANA > 100} {queueAdd nco {barkskin group}}
 				} {
@@ -169,61 +163,59 @@ event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences};
 		};
 	}
 }
+
 #alias doStaticField {
-	#switch {"$MSDP_CLASS"} {
-		#case {"Wizard"} {
-			#if { (@epoch{} - $lastStatic < $staticDelay) } { #return 1 } {#var lastStatic @epoch{}};
-			#if { ("$autostatic" == "on") } {
-				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
-					#if {$MSDP_MANA > 100} {queueAdd nco {static group}}
-				} {
-					#if {$MSDP_MANA > 40}  {queueAdd nco {static}}
-				}
-			}
-		};
-	}
-}
-#alias doUnholyAura {
-	#switch {"$MSDP_CLASS"} {
-		#case {"Dreadlord"} {
-			#if { (@epoch{} - $lastAura < $auraDelay) } { #return 1 } {#var lastAura @epoch{}};
-			#if { ("$autoaura" == "on") } {
-				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 9) } {
-					#if {$MSDP_MANA > 100} {queueAdd nco {aura group}}
-				} {
-					#if {$MSDP_MANA > 40}  {queueAdd nco {aura}}
-				}
-			}
-		};
-		#case {"Necromancer"} {
-			#if { (@epoch{} - $lastAura < $auraDelay) } { #return 1 } {#var lastAura @epoch{}};
-			#if { ("$autoaura" == "on") } {
-				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 2) } {
-					#if {$MSDP_MANA > 100} {queueAdd nco {aura group}}
-				} {
-					#if {$MSDP_MANA > 40}  {queueAdd nco {aura}}
-				}
-			}
-		};
-	}
-}
-#alias doGrimWard {
-	#switch {"$MSDP_CLASS"} {
-		#case {"Necromancer"} {
-			#if { (@epoch{} - $lastGrim < $grimDelay) } { #return 1 } {#var lastGrim @epoch{}};
-			#if { ("$autogrim" == "on") } {
-				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 2) } {
-					#if {$MSDP_MANA > 100} {queueAdd nco {grimw group}}
-				} {
-					#if {$MSDP_MANA > 40}  {queueAdd nco {grimw}}
-				}
-			}
-		};
+    #if {@autobuf_check{static field} && ("$autostatic" == "on")} {
+	    #switch {"$MSDP_CLASS"} {
+	    	#case {"Wizard"} {
+                #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
+                    #if {$MSDP_MANA > 100} {queueAdd nco {static group}}
+                } {
+                    #if {$MSDP_MANA > 40}  {queueAdd nco {static}}
+                }
+            }
+	    }
 	}
 }
 
-#alias doFFire {
+#alias doUnholyAura {
+    #if {@autobuf_check{aura} && ("autoaura" == "on")} {
+	    #switch {"$MSDP_CLASS"} {
+	    	#case {"Dreadlord"} {
+	       		#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 9) } {
+                    #if {$MSDP_MANA > 100} {queueAdd nco {aura group}}
+                } {
+                    #if {$MSDP_MANA > 40}  {queueAdd nco {aura}}
+                }
+	    	};
+	    	#case {"Necromancer"} {
+                #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 2) } {
+                    #if {$MSDP_MANA > 100} {queueAdd nco {aura group}}
+                } {
+                    #if {$MSDP_MANA > 40}  {queueAdd nco {aura}}
+                }
+            }
+	    }
+    } 
+}
+
+#alias doGrimWard {
 	#switch {"$MSDP_CLASS"} {
+		#case {"Necromancer"} {
+			#if { ("$autogrim" == "on") } {
+                #if { @autobuf_check } {
+				    #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 2) } {
+				    	#if {$MSDP_MANA > 100} {queueAdd nco {grimw group}}
+				    } {
+				    	#if {$MSDP_MANA > 40}  {queueAdd nco {grimw}}
+				    }
+                }
+			}
+        }
+	}
+}
+
+#alias doFFire {#switch {"$MSDP_CLASS"} {
 		#case {"Druid"} {
 			#if { (@epoch{} - $lastFFire < $ffireDelay) } { #return 1 } {#var lastFFire @epoch{}};
 				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
@@ -236,19 +228,14 @@ event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences};
 }
 
 #alias doSanctuary {
-
-    #if { (@epoch{} - $sanctDelay ) > $lastSanct } {
+    #if { @autobuf_check{sanctuary}} {
         #switch {"$sanctMethod"} {
-			#case {"none"} {#nop};
+			#case {"auto"} { nco doSmartSanct };
             #case {"potion"} {queueAdd nco {sanctPotion}};
             #case {"gsanc"} {queueAdd nco {gt gsanc}};
             #case {"spell"} {doSpellSanct};
-            #default {queueAdd nco {doSmartSanct}};
         };
-        #var lastSanct @epoch{}
-    } {
-        debug autobuf Not rerequesting sanct for $sanctDelay seconds.
-    }
+    } 
 }
 
 #alias doSpellSanct {
@@ -260,14 +247,11 @@ event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences};
 }
 
 #alias doSmartSanct {
-
-    #if {@groupIsPresent{Donal} == 1 } {queueAdd nco {gt gsanc}};
-    #elseif {@groupIsPresent{Ujarak} == 1 } {queueAdd nco {gt all sanct group}};
-    #elseif { "$MSDP_CLASS" == "Prophet" } { doSpellSanct };
-    #elseif { "$MSDP_CLASS" == "Templar" } { doSpellSanct };
-    #elseif {@groupIsPresent{Ariella} == 1 } {queueAdd nco {gt sanc group}};
-    #else {sanctPotion};
-
+    #switch {"$MSDP_CLASS"} {
+        #case {"Prophet"} {doSpellSanct};
+        #case {"Templar"} {doSpellSanct};
+        #default {sanctPotion}
+    }
 }
 
 #alias doBless {
@@ -298,6 +282,15 @@ event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences};
     };
 };
 
+#function autobuf_check {
+    #if {!&{autobuf_last[%1]}} {#var autobuf_last[%1] 0};
+    #if { (@epoch{} - $autobuf_delay) > $autobuf_last[%1] } {
+        #var autobuf_last[%1] @epoch{};
+        #return 1
+    } {
+        #return 0
+    }
+}
 
 #class autobuf close
 #nop -- vim: syntax=tt

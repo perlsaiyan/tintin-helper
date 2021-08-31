@@ -21,12 +21,23 @@
 
 #alias connect {
 	#showme attempt to create session for player %1.;
-	#session kallisti:%1 {kallistimud.com} {4000} {$players/%1_kallisti.player}
+	#session kallisti:%1 {kallistimud.com} {4000} {$players/%1_kallisti.player};
 }
 
 #alias post_connect_load {
+	info Loading post-connect modules;
+	load_module prefs;
+	load_module layout;
+	load_module kal_comms;
+	load_module map;
+	load_module queues;
 	#foreach {$modules_on_connect[%*]} {module} {
 			load_module $module
+	};
+
+	info kallisti Loading kallisti modules;
+	#foreach {autobuf;levels;meta;odometer} tmp {
+		load_module kallisti/$tmp
 	};
 	#line oneshot #tick {clear} {#buffer end} {0.5};
 }
