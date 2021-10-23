@@ -84,13 +84,13 @@ event_register {variable MSDP_GROUP} {right} {generate_group_info {%0} {%1} {%2}
             {$_flags};
              #list group_info add {{$_line}};
     };
-    #if {@isloaded{layout}} {display_right_tiles}
+    #if {@is_alias{display_right_tiles}} {display_right_tiles}
 }
 
 #alias generate_area_info {
     syslog right debug generate new area info - %1|%2|%3;
     #var area_info {${MSDP_AREA_NAME}\nLevel: $MSDP_AREA_MINLEVEL - $MSDP_AREA_MAXLEVEL};
-    #if {@isloaded{layout}} {display_right_tiles}
+    #if {@is_alias{display_right_tiles}} {display_right_tiles}
 }
 
 #nop -- generate_area_info;
