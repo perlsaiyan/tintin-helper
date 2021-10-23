@@ -5,8 +5,8 @@
 #var counter-description {Utilities for maintaining counters}
 #var counter-help {
 Commands:\n
-\tcounter_increment <counter name> <value> - increment a counter by value\n
-\tcounter_reset <counter name> <initial value> - reset a counter to optional start value\n
+\tcounter_increment <counter name> <value> - increment a counter by (optional) value\n
+\tcounter_reset <counter name> <initial value> - reset a counter to (optional) start value\n
 \n
 Functions:\n
 \tcounter_value{<counter name} - returns 0 if counter does not exist\n
