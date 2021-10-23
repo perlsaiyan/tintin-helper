@@ -37,9 +37,11 @@ Usage:\n
 #alias {^pref %1 %2} {
     #nop initialize a handler requested flag;
     #class prefs assign #var _pref_set_request 1;
-    event_raise {set preferences} {%1} {%2};
+    event_raise {set preferences} {%1} %2;
     #if {$_pref_set_request == 1} {
         warn No handler for %1, I'm afraid.
+    } {
+        _preferences_save
     }
 
 }
