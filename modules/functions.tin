@@ -228,4 +228,32 @@
     }
 } {5}
 
+#function is_alias {
+    #info aliases save;
+    #var result 0;
+    #foreach {*info[ALIASES][%*]} {_tmp} {
+        #if {"$info[ALIASES][$_tmp][arg1]" == "%1"} {#return $_tmp} 
+    };
+    #return 0
+}
+
+#function is_function {
+    #info function save;
+    #var result 0;
+    #foreach {*info[FUNCTIONS][%*]} {_tmp} {
+        #if {"$info[FUNCTIONS][$_tmp][arg1]" == "%1"} {#return $_tmp} 
+    };
+    #return 0
+}
+
+#function is_ticker {
+    #info ticker save;
+    #var result 0;
+    #foreach {*info[TICKERS][%*]} {_tmp} {
+        #if {"$info[TICKERS][$_tmp][arg1]" == "%1"} {#return $_tmp} 
+    };
+    #return 0
+}
+
+
 #nop -- vim: syntax=tt

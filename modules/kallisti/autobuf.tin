@@ -4,8 +4,16 @@
 
 #var kallisti/autobuf-description {Handle character bufs automatically}
 #var kallisti/autobuf-help {
-Under construction.  Needs all on/off switches moved to the coming\n
-prefs module.
+This module will loop through any affects you want and fire off commands\n
+to re-apply affects as desired.\n
+\n
+Usage: pref autobuf <affect> <auto|potion|spell|none> <threshold>\n
+Affect is something like "sanctuary", and threshold is the number of ticks\n
+remaining when we should start calling for renewal.\n
+\n
+Potion method: define an alias "potion", it will be called with %1 being the\n
+affect you want, so you can use #switch and use 'purple' for sanctuary, or\n
+even read a scroll, etc.
 }
 
 #nop --
@@ -32,6 +40,7 @@ init sanctMethod preferences auto;
 
 event_register {show preferences} {kallisti/autobuf} {autobuf_preferences};
 event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences}; 
+event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler %2};
 
 #alias autobuf_preferences {
     #nop %0;
@@ -43,10 +52,44 @@ event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences};
 }
 
 #alias autobuf_set_preferences {
-    #switch {"%2"} {
-        #case {"autobuf"} { #showme yeah, set %3 to whatever.; pref_handled }
+    #if {"%2" == "autobuf"} {
+        autobuf_set_pref_specific %3 %4 %5;
+        pref_handled
+    } {
+        #switch {"%2"} {
+            #case {"sanctuary"} {
+                autobuf_set_pref_specific %2 %3 %4;
+                pref_handled
+            }
+        }
     }
 }
+
+#nop -- This is buf, method, threshold
+#alias {autobuf_set_pref_specific %1 %2 %3} {
+    #if {"%3" === ""} {
+        #regexp {%2} {^%d$} {
+            #class autobuf assign #var _autobufs[%1][threshold] %2;
+            notice autobuf %1 threshold set to %2 ticks;
+        } {
+            #showme single arg, set %1 to method %2;
+            #class autobuf assign #var _autobufs[%1][method] %2;
+            notice autobuf %1 method set to %2;
+            #if {!&{_autobufs[%1][threshold]}} {
+                notice autobuf %1 threshold set to %1;
+                #class autobuf assign #var _autobufs[%1][threshold] 1;
+            }
+        }
+    } {
+        #regexp {%2 %3} {^%w %d$} {
+            #class autobuf assign #var _autobufs[%1] {{method}{%2}{threshold}{%3}};
+            notice autobuf %1 method set to %2, threshold set to %3;
+        } {
+            err autobuf Usage: pref %1 <method> <threshold>;
+        }
+    }
+} 
+
 #nop -- End Preference Management--
 
 #alias autoBuf {
@@ -70,18 +113,47 @@ event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences};
     #nop -- Affects we can renew during the last tick;
     #if {@hasAffect{unholy aura} < 2} {doUnholyAura};
     #if {@hasAffect{shapechange} < 2} {doShapechange};
-    #if {@hasAffect{sanctuary} < 2} {doSanctuary};
     #if {@hasAffect{divine armor} < 2} {doDivineArmor};
     #if {@hasAffect{vigor} < 2} {doVigor};
     #if {@hasAffect{barkskin} < 2} {doBarkskin};
     #if {@hasAffect{bless} < 2} {doBless};
 
-    #foreach {*MSDP_AFFECTS[%*]} {tmp} {
-        #if {@hasAffect{$tmp} <= 1} {
-            warn autobuf $tmp at $MSDP_AFFECTS[$tmp] duration
+    #nop TODO looping MSDP_AFFECTS isn't good enough, we need to do expired ones as well;
+    #nop We also don't want events on negative ones;
+    #foreach {*_autobufs[%*]} {tmp} {
+        #if {(@autobuf_check{$tmp}) && (@hasAffect{$tmp} <= $_autobufs[$tmp][threshold])} {
+            notice autobuf Need affect $tmp;
+            event_raise {autobuf expiration} {$tmp} {@hasAffect{$tmp}}
+        } {
+            info autobuf $tmp at @hasAffect{$tmp}, above duration;
         }
     }
 }
+
+#alias autobuf_handler {
+    #if {"$_autobufs[%1][method]" != "none"} {
+        #switch {"%1"} {
+            #case {"sanctuary"} {doSanctuary $_autobufs[%1][method]};
+            #default {err autobuf No autobuf_handler for %1}
+        }
+    }
+}
+
+#alias doSanctuary {
+    #switch {"%1"} {
+			#case {"auto"} { nco doSmartSanct };
+            #case {"potion"} {
+                #if {@is_alias{potion}} {
+                        queueAdd nco {potion sanctuary}
+                    } {
+                        warn autobuf No 'potion' alias defined and method set to potion, see 'help kallisti/autobuf'
+                    };
+            };
+            #case {"spell"} {doSpellSanct};
+    };
+}
+
+#nop -- Legacy handlers below
 
 #alias doTruesee {
     #switch {"$MSDP_CLASS"} {
@@ -105,7 +177,7 @@ event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences};
 }
 
 #alias doDivineArmor {
-    #if {@autobuf_check{darmor} && ("$autodarmor" == "on"} {
+    #if {@autobuf_check{darmor} && ("$autodarmor" == "on")} {
         #if { ("$MSDP_CLASS" == "Templar") || ("$MSDP_CLASS" == "Prophet") } {
             #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
                 #if {$MSDP_MANA > 160} {queueAdd nco {darmor group}}
@@ -227,16 +299,6 @@ event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences};
 	}
 }
 
-#alias doSanctuary {
-    #if { @autobuf_check{sanctuary}} {
-        #switch {"$sanctMethod"} {
-			#case {"auto"} { nco doSmartSanct };
-            #case {"potion"} {queueAdd nco {sanctPotion}};
-            #case {"gsanc"} {queueAdd nco {gt gsanc}};
-            #case {"spell"} {doSpellSanct};
-        };
-    } 
-}
 
 #alias doSpellSanct {
     #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
@@ -282,6 +344,8 @@ event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences};
     };
 };
 
+#nop -- functions below
+
 #function autobuf_check {
     #if {!&{autobuf_last[%1]}} {#var autobuf_last[%1] 0};
     #if { (@epoch{} - $autobuf_delay) > $autobuf_last[%1] } {
@@ -290,6 +354,11 @@ event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences};
     } {
         #return 0
     }
+}
+
+#function autobuf_abbreviations {
+    #regex {sanctuary} {{^%1}} {#return sanctuary};
+    #return %1
 }
 
 #class autobuf close
