@@ -36,7 +36,7 @@
 	};
 
 	info kallisti Loading kallisti modules;
-	#foreach {autobuf;levels;meta;odometer} tmp {
+	#foreach {autobuf;levels;meta;odometer;counter;playermap} tmp {
 		load_module kallisti/$tmp
 	};
 	#line oneshot #tick {clear} {#buffer end} {0.5};
