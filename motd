@@ -1,4 +1,6 @@
 
-Welcome to tintin++, using Bhang's module system.
+Welcome to tintin++, using Bhang's tintin-helper system.
 
-Support for connecting to muds or playing is not yet implemented.
+If you've configured this client connect <character> to begin.
+Get help: https://github.com/perlsaiyan/tintin-helper
+

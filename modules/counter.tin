@@ -1,0 +1,47 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var counter-description {Utilities for maintaining counters}
+#var counter-help {
+Commands:\n
+\tcounter_increment <counter name> <value> - increment a counter by value\n
+\n
+Functions:\n
+\tcounter_value{<counter name} - returns 0 if counter does not exist\n
+}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias counter-register {
+	#if {@isloaded{modloader}} {
+
+		register_module counter
+	} {
+		#class counter kill
+	}
+}
+
+#tab counter_increment
+#alias {counter_increment %1 %2} {
+    #if {&_COUNTERS[%1]} {
+        #math _COUNTERS[%1] {$_COUNTERS[%1] + %2}
+    } {
+        init _COUNTERS[%1] counter %2;
+    }
+} {3}
+
+#alias {counter_increment} {
+    #showme Usage: counter_increment <counter name> <value>
+} {5}
+
+#function {counter_value} {
+    #if {&_COUNTERS[%1]} {
+        #return $_COUNTERS[%1]
+    } {
+        err Counter '%1' not initialized.;
+        #return 0
+    }
+}
