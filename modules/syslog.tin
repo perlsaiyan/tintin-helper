@@ -53,6 +53,7 @@ init loglevel_preference syslog warn;
 init syslog-prechar syslog >>
 #alias {debug %1 %2} {syslog %1 debug %2}
 #alias {info %1 %2} {syslog %1 info %2}
+#alias {notice %1 %2} {syslog %1 notice %2}
 #alias {warn %1 %2} {syslog %1 warn %2}
 #alias {err %1 %2} {syslog %1 err %2}
 #alias {crit %1 %2} {syslog %1 crit %2}
