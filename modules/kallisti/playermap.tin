@@ -12,7 +12,7 @@
 
 #alias kallisti/playermap-register {
 	#if {@isloaded{modloader}} {
-        #line quiet #class playermapdb read $db/playermap.db;
+        #line quiet #class kallisti/playermapdb read $db/playermap.db;
 		register_module kallisti/playermap
 	} {
 		#class kallisti/playermap kill
@@ -23,6 +23,7 @@
 event_register {commsGos} {kallisti/playermap} {playermap_comms {%2}};
 event_register {commsDev} {kallisti/playermap} {playermap_comms {%2}};
 event_register {commsTell} {kallisti/playermap} {playermap_comms {%2}};
+
 
 #alias playermap_comms {
     #REGEXP {%1} {%S (%S)} {
@@ -35,13 +36,11 @@ event_register {commsTell} {kallisti/playermap} {playermap_comms {%2}};
                 _save_playermap
             }
         }
-    } {
-        err playermap No "player(account)" match on &1
-    }
+    } 
 }
 
 #alias _save_playermap {
-    #class playermapdb write $db/playermap.db    
+    #class kallisti/playermapdb write $db/playermap.db    
 }
 
 #function account {

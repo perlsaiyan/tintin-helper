@@ -33,6 +33,7 @@ load_module syslog
 load_module events
 load_module msdp
 load_module help
+load_module counter
 
 
 #nop -- This module will control kallisti accounts

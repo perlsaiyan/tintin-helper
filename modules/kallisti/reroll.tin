@@ -1,0 +1,71 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var kallisti/reroll-description {Utilities for rerolling a character}
+#var kallisti/reroll-help {Reroll a character quickly, while adhering to preferences.\n
+\t* #var reroll[prime] <stat> - this will be where your best stat goes.\n
+\t* #var reroll[<stat>] <min> - <stat> can be str, int, wis, dex, con, luk\n
+\n
+\tYou can see the defaults with #var reroll.  Just type 'reroll' to start rerolling.\n
+\tThere is a maximum $roll_count, if you hit the limit, you'll need to reset\n
+\tthis to 0.
+}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias kallisti/reroll-register {
+	#if {@isloaded{modloader}} {
+        init reroll[prime] kallisti/reroll str;
+        init roll_max kallisti/reroll 10000;
+        #foreach {str;int;wis;dex;con;luk} {tmp} {
+            #if {!&reroll[$tmp]} {#var reroll[$tmp] 1};
+        }
+		register_module kallisti/reroll
+	} {
+		fail_module kallisti/reroll unknown reason
+	}
+}
+
+#alias reroll_test {
+    #var reroll 0;
+    #list {_message} {clear};
+    #if {$_str < $reroll[str]} { #var reroll 1; #list {_message} {add} {str:$_str}};
+    #if {$_int < $reroll[int]} { #var reroll 1; #list {_message} {add} {int:$_int}};
+    #if {$_wis < $reroll[wis]} { #var reroll 1; #list {_message} {add} {wis:$_wis}};
+    #if {$_dex < $reroll[dex]} { #var reroll 1; #list {_message} {add} {dex:$_dex}};
+    #if {$_con < $reroll[con]} { #var reroll 1; #list {_message} {add} {con:$_con}};
+    #if {$_luk < $reroll[luk]} { #var reroll 1; #list {_message} {add} {luk:$_luk}};
+
+    #math {_sum} {$_str + $_int + $_wis + $_dex + $_con};
+
+    #nop -- Some emergency cutoff stuff;
+    #if {$roll_count > $max_roll} {
+        notice kallisti/reroll Max roll count exceeded ($roll_count).;
+        #var reroll 0;
+    };   
+    #nop -- Reroll or Stop?;
+    #if { $reroll == 0 } {
+        notice kallisti/reroll How does this look, roll $roll_count?;
+    } {
+        notice kallisti/reroll $roll_count: this char: $_message - sum:$_sum;
+        reroll $prime_stat;
+    }
+
+}
+
+#act {New base stats: Str %d, Int %d, Wis %d, Dex %d, Con %d, Luk %d} {
+    #math {roll_count} {$roll_count + 1};
+    #var _str %1;
+    #var _int %2;
+    #var _wis %3;
+    #var _dex %4;
+    #var _con %5;
+    #var _luk %6;
+
+    reroll_test;
+}
+
+#nop vim: syntax=tt

@@ -255,5 +255,14 @@
     #return 0
 }
 
+#function is_variable {
+    #info variable save;
+    #var result 0;
+    #foreach {*info[VARIABLES][%*]} {_tmp} {
+        #if {"$info[VARIABLES][$_tmp][arg1]" == "%1"} {#return $_tmp} 
+    };
+    #return 0
+}
+
 
 #nop -- vim: syntax=tt
