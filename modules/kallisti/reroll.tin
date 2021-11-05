@@ -30,33 +30,33 @@
 }
 
 #alias reroll_test {
-    #var reroll 0;
+    #var rollcheck 0;
     #list {_message} {clear};
-    #if {$_str < $reroll[str]} { #var reroll 1; #list {_message} {add} {str:$_str}};
-    #if {$_int < $reroll[int]} { #var reroll 1; #list {_message} {add} {int:$_int}};
-    #if {$_wis < $reroll[wis]} { #var reroll 1; #list {_message} {add} {wis:$_wis}};
-    #if {$_dex < $reroll[dex]} { #var reroll 1; #list {_message} {add} {dex:$_dex}};
-    #if {$_con < $reroll[con]} { #var reroll 1; #list {_message} {add} {con:$_con}};
-    #if {$_luk < $reroll[luk]} { #var reroll 1; #list {_message} {add} {luk:$_luk}};
+    #if {$_str < $reroll[str]} { #var rollcheck 1; #list {_message} {add} {str:$_str}};
+    #if {$_int < $reroll[int]} { #var rollcheck 1; #list {_message} {add} {int:$_int}};
+    #if {$_wis < $reroll[wis]} { #var rollcheck 1; #list {_message} {add} {wis:$_wis}};
+    #if {$_dex < $reroll[dex]} { #var rollcheck 1; #list {_message} {add} {dex:$_dex}};
+    #if {$_con < $reroll[con]} { #var rollcheck 1; #list {_message} {add} {con:$_con}};
+    #if {$_luk < $reroll[luk]} { #var rollcheck 1; #list {_message} {add} {luk:$_luk}};
 
     #math {_sum} {$_str + $_int + $_wis + $_dex + $_con};
 
     #nop -- Some emergency cutoff stuff;
-    #if {$roll_count > $max_roll} {
+    #if {$roll_count > $roll_max} {
         notice kallisti/reroll Max roll count exceeded ($roll_count).;
-        #var reroll 0;
+        #var rollcheck 0;
     };   
     #nop -- Reroll or Stop?;
-    #if { $reroll == 0 } {
+    #if { $rollcheck == 0 } {
         notice kallisti/reroll How does this look, roll $roll_count?;
     } {
         notice kallisti/reroll $roll_count: this char: $_message - sum:$_sum;
-        reroll $prime_stat;
+        reroll $reroll[prime];
     }
 
 }
 
-#act {New base stats: Str %d, Int %d, Wis %d, Dex %d, Con %d, Luk %d} {
+#action {New base stats: Str %d, Int %d, Wis %d, Dex %d, Con %d, Luk %d} {
     #math {roll_count} {$roll_count + 1};
     #var _str %1;
     #var _int %2;
