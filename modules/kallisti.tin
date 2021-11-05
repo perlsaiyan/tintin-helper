@@ -10,7 +10,7 @@
 #nop --
 
 #alias kallisti-register {
-	#if {@isloaded{functions}} {
+	#if {@isloaded{events}} {
 		register_module kallisti
 	} {
 		fail_module kallist
@@ -18,10 +18,17 @@
 }
 
 #tab connect
-
 #alias connect {
 	#showme attempt to create session for player %1.;
-	#session kallisti:%1 {kallistimud.com} {4000} {$players/%1_kallisti.player};
+	#switch {"%2"} {
+		#case {"tp"} {
+			#session kallisti:%1 {kallistimud.com} {4069} {$players/%1_kallisti.player};
+		};
+		#default {
+			#session kallisti:%1 {kallistimud.com} {4000} {$players/%1_kallisti.player};
+		};
+	};
+	
 }
 
 #alias post_connect_load {
@@ -97,5 +104,7 @@ event_register {variable MSDP_GROUP} {right} {generate_group_info {%0} {%1} {%2}
 #nop -- generate_group_info;
 
 #tick {idle} {#cr} {30}
+
+#action {^You have no knowledge of the spell, '%1'.} {event_raise {unlearned spell} {%1}}
 
 #nop vim: syntax=tt
