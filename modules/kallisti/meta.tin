@@ -23,10 +23,9 @@ to endlessly disappoint you with how much xp and gold you've used.
 	}
 }
 
-#var metaXPCost {}
-#var metaAUCost {}
-
-#var metaHero {}
+init metaXPCost preferences 0
+init metaAUCost preferences 0
+init metaHero preferences 0
 
 #list metaGains[Mage] create 3.5 5.5 3.5
 #list metaGains[Wizard] create 3.5 5.5 3.5
@@ -99,12 +98,31 @@ to endlessly disappoint you with how much xp and gold you've used.
     #echo $_line2;
 }
 
+#tab metaCost 
+#alias metaCost {
+    
+    #math {metaavg} { ($metaXPCost[hp] + $metaXPCost[mana] + $metaXPCost[stam]) / 3};
+    #math tmp {$MSDP_EXPERIENCE / $metaavg};
+
+    #echo {Current Meta Costs (est. @estimated_metas{} metas with current XP):};
+    #echo { HitP: $metaXPCost[hp] ($metaHero[hp] per hero)};
+    #echo { Mana: $metaXPCost[mana] ($metaHero[mana] per hero)};
+    #echo { Stam: $metaXPCost[stam] ($metaHero[stam] per hero)};
+    
+}
+
 #nop -- ---------------------------------------------------------------
 #nop -- Autometa functions
 #nop -- ---------------------------------------------------------------
-#func metaHeroHit {#math result {$metaGains[$MSDP_CLASS][1] * $metaHerosPer[$MSDP_CLASS][1]}}
-#func metaHeroMana {#math result {$metaGains[$MSDP_CLASS][2] * $metaHerosPer[$MSDP_CLASS][2]}}
-#func metaHeroStam {#math result {$metaGains[$MSDP_CLASS][3] * $metaHerosPer[$MSDP_CLASS][3]}}
+#function metaHeroHit {#math result {$metaGains[$MSDP_CLASS][1] * $metaHerosPer[$MSDP_CLASS][1]}}
+#function metaHeroMana {#math result {$metaGains[$MSDP_CLASS][2] * $metaHerosPer[$MSDP_CLASS][2]}}
+#function metaHeroStam {#math result {$metaGains[$MSDP_CLASS][3] * $metaHerosPer[$MSDP_CLASS][3]}}
+#function one_meta_cost {
+    #math {result} { ($metaXPCost[hp] + $metaXPCost[mana] + $metaXPCost[stam]) / 3};
+}
+#function estimated_metas {
+    #math result {$MSDP_EXPERIENCE / @one_meta_cost{}}
+}
 
 #act {^HitPoints             : {\d+} exp & {\d+} coins : Current {\d+}$} {
     #var metaXPCost[hp] %1; #var metaAUCost[hp] %2;
