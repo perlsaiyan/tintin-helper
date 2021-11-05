@@ -34,13 +34,13 @@ even read a scroll, etc.
 
 #nop -- Preference Management --
 init sanctMethod preferences auto;
-#foreach {autoguardian;autobark;autostatic;autoaura;autogrim;autodshield} {tmp} {
+#foreach {autoguardian;autobark;autostatic;autoaura;autogrim;autodshield;autoffire} {tmp} {
     init $tmp preferences off;
 }
 
 event_register {show preferences} {kallisti/autobuf} {autobuf_preferences};
 event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences}; 
-event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler %2};
+event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 
 #alias autobuf_preferences {
     #nop %0;
@@ -60,13 +60,17 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler %2};
             #case {"sanctuary"} {
                 autobuf_set_pref_specific %2 %3 %4;
                 pref_handled
-            }
+            };
+            #case {"ffire"} {
+                autobuf_set_pref_specific {faerie fire} %3 %4;
+                pref_handled
+            };
         }
     }
 }
 
 #nop -- This is buf, method, threshold
-#alias {autobuf_set_pref_specific %1 %2 %3} {
+#alias {autobuf_set_pref_specific} {
     #if {"%3" === ""} {
         #regexp {%2} {^%d$} {
             #class autobuf assign #var _autobufs[%1][threshold] %2;
@@ -106,7 +110,6 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler %2};
     #if {@hasAffect{spiritual guardian} < 1} {doSpiritGuardian};
     #if {@hasAffect{divine shield} < 1} {doDivineShield};
     #if {@hasAffect{blade barrier} < 1} {doBladeBarrier};
-    #if {@hasAffect{faerie fire} < 1} {doFFire};
     #if {@hasAffect{static field} < 1} {doStaticField};
     #if {@hasAffect{grim ward} < 1} {doGrimWard};
 
@@ -134,6 +137,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler %2};
     #if {"$_autobufs[%1][method]" != "none"} {
         #switch {"%1"} {
             #case {"sanctuary"} {doSanctuary $_autobufs[%1][method]};
+            #case {"faerie fire"} {doFFire $_autobufs[%1][method]};
             #default {err autobuf No autobuf_handler for %1}
         }
     }
@@ -150,6 +154,22 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler %2};
                     };
             };
             #case {"spell"} {doSpellSanct};
+    };
+}
+
+#alias doFFire {
+    #switch {"%1"} {
+        #case {"auto"} {
+            #if { (@epoch{} - $lastFFire < $ffireDelay) } { #return 1 } {#var lastFFire @epoch{}};
+            #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
+                #if {$MSDP_MANA > 100} {queueAdd nco {ffire group}}
+            } {
+                #if {$MSDP_MANA > 40}  {queueAdd nco {ffire}}
+            }
+
+        };
+        #case {"none"} {#nop};
+        #default {warn autobuf No method '%1' for faerie fire.};
     };
 }
 
@@ -287,17 +307,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler %2};
 	}
 }
 
-#alias doFFire {#switch {"$MSDP_CLASS"} {
-		#case {"Druid"} {
-			#if { (@epoch{} - $lastFFire < $ffireDelay) } { #return 1 } {#var lastFFire @epoch{}};
-				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
-					#if {$MSDP_MANA > 100} {queueAdd nco {ffire group}}
-				} {
-					#if {$MSDP_MANA > 40}  {queueAdd nco {ffire}}
-				}
-		};
-	}
-}
+
 
 
 #alias doSpellSanct {
