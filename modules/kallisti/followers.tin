@@ -1,0 +1,35 @@
+#nop -- follower management
+
+#var kallisti/followers-description {Follower / Group Management}
+#var kallisti/followers-help {
+Recharm followers, convenience commands.
+}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias kallisti/followers-register {
+	#if {@isloaded{modloader}} {
+		register_module kallisti/followers
+	} {
+		fail_module kallisti/followers unknown reason
+	}
+}
+
+#alias oo {order followers %0}
+
+#action {^Renewing charm duration for %1 to %d hours.$} {
+    #untick {charmm failer};
+    #math {cdelay} { ( %2 - 2 ) * 75 };
+    #line oneshot #tick {recharm} {#tick {charmm failer} {charm_group} {20}} {$cdelay}
+}
+
+#alias charm_group {
+    #switch {"$MSDP_CLASS"} {
+        #case {"Druid"} {nco friend group};
+        #default {error No recharm method for $MSDP_CLASS};
+    };
+}
+
+
