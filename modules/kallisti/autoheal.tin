@@ -26,6 +26,11 @@ event_register {variable MSDP_GROUP} {autoheal} {autoheal};
 
 #alias {autoheal} {
     #nop %0;
+    #if {&MSDP_GROUP[] == 0} {
+        #if {@pct{$MSDP_HEALTH;$MSDP_HEALTH_MAX} < $healpct} {
+            queueAdd heal {heal}
+        };
+    };
     #foreach *MSDP_GROUP[%*] {_tmp} {
         #if {@healBlacklist{$MSDP_GROUP[$_tmp][name]} > 0} {#continue};
         #if {$MSDP_GROUP[$_tmp][health] < $healpct } {
@@ -46,14 +51,15 @@ event_register {variable MSDP_GROUP} {autoheal} {autoheal};
                 }
             }
         };
-        #if {"$mount_heal" == "on"} {
-            #if {$MSDP_MOUNT_HEALTH_MAX > 0} {
-                #if {@pct{$MSDP_MOUNT_HEALTH;$MSDP_MOUNT_HEALTH_MAX} < 50} {
-                    queueAdd heal {heal $mount}
-                }
-            };
+    };
+    #if {"$mount_heal" == "on"} {
+        #if {$MSDP_MOUNT_HEALTH_MAX > 0} {
+            #if {@pct{$MSDP_MOUNT_HEALTH;$MSDP_MOUNT_HEALTH_MAX} < 50} {
+                queueAdd heal {heal $mount}
+            }
         };
-    }
+    };
+    
 }
 
 #function refreshBlacklist {#list {refreshBlack} {find} {%1} {result}}
