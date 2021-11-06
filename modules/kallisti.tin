@@ -24,6 +24,9 @@
 		#case {"tp"} {
 			#session kallisti:%1 {kallistimud.com} {4069} {$players/%1_kallisti.player};
 		};
+		#case {"builder"} {
+			#session kallisti:%1 {kallistimud.com} {4005} {$players/%1_kallisti.player};
+		};
 		#default {
 			#session kallisti:%1 {kallistimud.com} {4000} {$players/%1_kallisti.player};
 		};
@@ -43,7 +46,7 @@
 	};
 
 	info kallisti Loading kallisti modules;
-	#foreach {autobuf;levels;meta;odometer;playermap} tmp {
+	#foreach {autobuf;autoheal;levels;meta;odometer;playermap} tmp {
 		load_module kallisti/$tmp
 	};
 	#line oneshot #tick {clear} {#buffer end} {0.5};
