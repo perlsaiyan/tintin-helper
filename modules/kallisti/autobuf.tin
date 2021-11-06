@@ -22,6 +22,7 @@ even read a scroll, etc.
 
 #alias kallisti/autobuf-register {
 	#if {@isloaded{queues}} {
+        autobuf_init;
 		register_module kallisti/autobuf
 	} {
 		fail_module kallisti/autobuf Need queues module
@@ -41,6 +42,15 @@ init sanctMethod preferences auto;
 event_register {show preferences} {kallisti/autobuf} {autobuf_preferences};
 event_register {set preferences} {kallisti/autobuf} {autobuf_set_preferences}; 
 event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
+
+#alias autobuf_init {
+    #nop -- renewable spells;
+    #foreach {faerie fire;true seeing;sanctuary;shapechange} {_tmp} {
+        #if {!&{_autobufs[$_tmp]}} {
+            autobuf_set_pref_specific {$_tmp} none 1
+        }
+    }
+}
 
 #alias autobuf_preferences {
     #nop %0;
@@ -66,6 +76,10 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
             };
             #case {"ffire"} {
                 autobuf_set_pref_specific {faerie fire} %3 %4;
+                pref_handled
+            };
+            #case {"truesee"} {
+                autobuf_set_pref_specific {true seeing} %3 %4;
                 pref_handled
             };
             #case {"shapechange"} {
@@ -113,7 +127,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 
     #nop -- Affects that must exhaust completely;
     #if {@hasAffect{warcry} < 1} {doWarcry};
-    #if {@hasAffect{true seeing} < 1} {doTruesee};
+
     #if {@hasAffect{spiritual guardian} < 1} {doSpiritGuardian};
     #if {@hasAffect{divine shield} < 1} {doDivineShield};
     #if {@hasAffect{blade barrier} < 1} {doBladeBarrier};
@@ -142,17 +156,28 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 #alias autobuf_handler {
     #if {"$_autobufs[%1][method]" != "none"} {
         #switch {"%1"} {
-            #case {"sanctuary"} {doSanctuary $_autobufs[%1][method]};
             #case {"faerie fire"} {doFFire $_autobufs[%1][method]};
+            #case {"sanctuary"} {doSanctuary $_autobufs[%1][method]};
             #case {"shapechange"} {doShapechange $_autobufs[%1][method]};
+            #case {"true seeing"} {doTruesee $_autobufs[%1][method]};
             #default {err autobuf No autobuf_handler for %1}
         }
     }
 }
 
+#alias doTruesee {
+    #switch {"$MSDP_CLASS"} {
+        #case {"Prophet"} {queueAdd nco {true}};
+        #case {"Druid"} {queueAdd nco {true}};
+        #case {"Templar"} {queueAdd nco {true}};
+    };
+}
+
+
 #alias doSanctuary {
     #switch {"%1"} {
-			#case {"auto"} { nco doSmartSanct };
+			#case {"auto"} { nco doSmartSanct};
+            #case {"spell"} { nco doSpellSanct};
             #case {"potion"} {
                 #if {@is_alias{potion}} {
                         queueAdd nco {potion sanctuary}
@@ -197,13 +222,6 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 
 #nop -- Legacy handlers below
 
-#alias doTruesee {
-    #switch {"$MSDP_CLASS"} {
-        #case {"Prophet"} {queueAdd nco {true}};
-        #case {"Druid"} {queueAdd nco {true}};
-        #case {"Templar"} {queueAdd nco {true}};
-    };
-}
 
 
 #alias doWarcry {
