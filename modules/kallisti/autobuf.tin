@@ -46,8 +46,11 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
     #nop %0;
     #if {("%2" == "autobuf") || ("%2" == "")} {
         #showme <afc>Autobuf;
-        #format line {<caf>%%10s: <fac>%%10s} {sanctmethod} {$sanctMethod};
+        #foreach {*_autobufs[%*]} {tmp} {
+        #format line {<caf>%+12s: <fac>%-10s} {$tmp} {$_autobufs[$tmp][method]};
         #showme $line
+        };
+        
     }
 }
 
@@ -65,6 +68,10 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
                 autobuf_set_pref_specific {faerie fire} %3 %4;
                 pref_handled
             };
+            #case {"shapechange"} {
+                autobuf_set_pref_specific {shapechange} %3 %4;
+                pref_handled
+            }
         }
     }
 }
@@ -73,20 +80,20 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 #alias {autobuf_set_pref_specific} {
     #if {"%3" === ""} {
         #regexp {%2} {^%d$} {
-            #class autobuf assign #var _autobufs[%1][threshold] %2;
+            #class preferences assign #var _autobufs[%1][threshold] %2;
             notice autobuf %1 threshold set to %2 ticks;
         } {
             #showme single arg, set %1 to method %2;
-            #class autobuf assign #var _autobufs[%1][method] %2;
+            #class preferences assign #var _autobufs[%1][method] %2;
             notice autobuf %1 method set to %2;
             #if {!&{_autobufs[%1][threshold]}} {
                 notice autobuf %1 threshold set to %1;
-                #class autobuf assign #var _autobufs[%1][threshold] 1;
+                #class preferences assign #var _autobufs[%1][threshold] 1;
             }
         }
     } {
         #regexp {%2 %3} {^%w %d$} {
-            #class autobuf assign #var _autobufs[%1] {{method}{%2}{threshold}{%3}};
+            #class preferences assign #var _autobufs[%1] {{method}{%2}{threshold}{%3}};
             notice autobuf %1 method set to %2, threshold set to %3;
         } {
             err autobuf Usage: pref %1 <method> <threshold>;
@@ -115,7 +122,6 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 
     #nop -- Affects we can renew during the last tick;
     #if {@hasAffect{unholy aura} < 2} {doUnholyAura};
-    #if {@hasAffect{shapechange} < 2} {doShapechange};
     #if {@hasAffect{divine armor} < 2} {doDivineArmor};
     #if {@hasAffect{vigor} < 2} {doVigor};
     #if {@hasAffect{barkskin} < 2} {doBarkskin};
@@ -138,6 +144,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
         #switch {"%1"} {
             #case {"sanctuary"} {doSanctuary $_autobufs[%1][method]};
             #case {"faerie fire"} {doFFire $_autobufs[%1][method]};
+            #case {"shapechange"} {doShapechange $_autobufs[%1][method]};
             #default {err autobuf No autobuf_handler for %1}
         }
     }
@@ -172,6 +179,21 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
         #default {warn autobuf No method '%1' for faerie fire.};
     };
 }
+
+#alias doShapechange {
+    warn autobuf shapechange to %1;
+    #if {"%1" == "werewolf"} {
+        queueAdd nco {werewolf}
+    };
+    #else {
+		#switch {"$MSDP_CLASS"} {
+			#case {"Druid"} {queueAdd nco {shapechange %1}};
+			#case {"Necromancer"} {queueAdd nco {mortify %1}};
+            #default { error autobuf No method for shapechange for $MSDP_CLASS}
+		};
+    };
+};
+
 
 #nop -- Legacy handlers below
 
@@ -342,17 +364,6 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 }
 #alias sanctPotion {pg purple;quaff purple};
 
-#alias doShapechange {
-    #if {"${pref_shapechange}" == "werewolf"} {
-        queueAdd nco {werewolf}
-    };
-    #elseif {&{pref_shapechange}} {
-		#switch {"$MSDP_CLASS"} {
-			#case {"Druid"} {queueAdd nco {shapechange $pref_shapechange}};
-			#case {"Necromancer"} {queueAdd nco {mortify $pref_shapechange}};
-		};
-    };
-};
 
 #nop -- functions below
 
