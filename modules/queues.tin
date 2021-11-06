@@ -23,6 +23,7 @@ Combat queues clear at the end of combat automatically.\n
 #alias queues-register {
 	#if {@isloaded{modloader}} {
 		register_module queues;
+        queue_init;
 		queue_block
 	} {
 		fail_module queues unknown reason
@@ -31,6 +32,14 @@ Combat queues clear at the end of combat automatically.\n
 #var spellLock 0;
 
 #list spellValidPositions create Flying Fighting Mounted Standing Swimming;
+
+#alias queue_init {
+    #foreach {priority;heal;any;combat;nco;move} {_tmp} {
+       #if {!&{_queue[$_tmp]}} {
+           #list _queue[$_tmp] create;
+       };
+    }
+}
 
 #alias {queueAdd %1 %2} {
     #list _queue[%1] find {%2} {sindex};
@@ -133,7 +142,7 @@ Combat queues clear at the end of combat automatically.\n
         &{_queue}[nco][]
 		&{_queue}[move][];
 
-	display_right_tiles
+	#if {@is_alias{display_right_tiles}} {display_right_tiles};
 }
 
 #nop -- ---------------------------------------------------------------
