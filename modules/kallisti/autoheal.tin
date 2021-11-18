@@ -30,6 +30,9 @@ event_register {variable MSDP_GROUP} {autoheal} {autoheal};
         #if {@pct{$MSDP_HEALTH;$MSDP_HEALTH_MAX} < $healpct} {
             queueAdd heal {heal}
         };
+        #if {@pct{$MSDP_STAMINA;$MSDP_STAMINA_MAX} < $refreshpct} {
+            queueADd heal {refresh}
+        };
     };
     #foreach *MSDP_GROUP[%*] {_tmp} {
         #if {@healBlacklist{$MSDP_GROUP[$_tmp][name]} > 0} {#continue};
