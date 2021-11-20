@@ -31,6 +31,7 @@ init comms-session comms;
 #if {!&info[SESSIONS][${comms-session}]} {
 	#line quiet #port {init} {${comms-session}} {0};
 	#ses -;
+	#${comms-session} {#untick idle};
 }
 
 #${comms-session} #macro {OP} {#ses kallisti:${char_name}};
@@ -129,6 +130,13 @@ init comms-session comms;
 	event_raise {commsChat} {%2} {%0};
 } {9}
 
+#action {^You say, '%1'$} {
+	event_raise {commsSay} {You} {%1} {%0};
+}
+#action {^%w {says|grunts}, '%1'$} {
+	event_raise {commsSay} {%1} {%3} {%0};
+}
+
 #nop -- ---------------------------------------------------------------
 #nop -- Events
 #nop -- ---------------------------------------------------------------
@@ -139,6 +147,7 @@ event_register {commsTell}  {kal_comms} {update_chat tell {%4}};
 event_register {commsWorld} {kal_comms} {update_chat world {%3}};
 event_register {commsDev}   {kal_comms} {update_chat dev {%4}};
 event_register {commsChat}  {kal_comms} {update_chat chat {%3}};
+event_register {commsSay}   {kal_comms} {update_chat say {%4}};
 
 
 #nop -- vim: syntax=tt
