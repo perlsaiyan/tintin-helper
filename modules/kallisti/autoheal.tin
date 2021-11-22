@@ -23,6 +23,9 @@ init refreshManaThreshold preferences 320
 
 #list healblack create;
 event_register {variable MSDP_GROUP} {autoheal} {autoheal};
+event_register {variable MSDP_HEALTH} {autoheal} {autoheal};
+event_register {variable MSDP_STAMINA} {autoheal} {autoheal};
+
 
 #alias {autoheal} {
     #nop %0;
