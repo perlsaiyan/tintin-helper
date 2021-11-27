@@ -1,0 +1,65 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var kallisti/scavenge-description {Scavenge from the room as we move.}
+#var kallisti/scavenge-help {Automatically pick up items we encounter.}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias kallisti/scavenge-register {
+	#if {@isloaded{queues}} {
+		register_module kallisti/scavenge
+	} {
+		fail_module kallisti/scavenge Need queues module
+	}
+}
+
+#action {~^\e[0m\e[0;32m< {\w+} |} {
+    event_raise {prompt} {%1}
+}
+#nop -- Item?;
+#action {~^\e[0;37m{[^\e].*}} {
+    #if {("$scavenge_search" == "on") && ("$scavenge_mob" != "on")} {
+        warn kallisti/scavenge item: %1;
+        #regexp {%1} {^A red book embossed with a black cross lies here} {get book;pp book};
+        #regexp {%1} {^A small shard of desoy floats nearby.} {get all.desoy;pp all.desoy};
+    };
+}
+#action {~^\e[0;37m\e[0;36m{.*}\e[0m]} {
+    warn kallisti/scavenge blue item: %1;
+}
+
+#nop -- Mobs? Needs to move to mobs.tin;
+#nop -- Probably combine these;
+#action {~^\e[0;37m\e[1;37m{[^\e].*}} {
+    #if {"$scavenge_search" == "on"} {
+        event_raise {room see mob} {%1};
+        info kallisti/scavenge mob: %1;
+    }
+}
+#nop -- First mob in room;
+#action {~^\e[1;37m{[^\e].*}} {
+    #if {"$scavenge_search" == "on"} {
+        event_raise {room see mob} {%1};
+        info kallisti/scavenge mob: %1;
+    }
+}
+
+#action {~^\e[1;35m{.*}} {
+    #variable {scavenge_search} {on}
+}
+
+
+event_register {prompt} {kallisti/scavenge} {scavenge_off};
+event_register {room see mob} {kallisti/scavenge} {
+    #var scavenge_mob on
+};
+
+#alias scavenge_off {
+    #nop %0;
+    #VARIABLE {scavenge_search} {off};
+    #variable {scavenge_mob} {off};
+}

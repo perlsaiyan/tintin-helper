@@ -109,5 +109,14 @@ event_register {variable MSDP_GROUP} {right} {generate_group_info {%0} {%1} {%2}
 #tick {idle} {#cr} {30}
 
 #action {^You have no knowledge of the spell, '%1'.} {event_raise {unlearned spell} {%1}}
+#act {^You receive your reward for the kill, %1 experience points.} {
+    #buffer get _ripline -1;
+    #var _xp %1;
+    #regex {$_ripline} {{.*} is dead!} {
+        event_raise {mob kill} {&1} $_xp
+    } {
+        event_raise {mob kill} {unknown} $_xp
+    }
+}
 
 #nop vim: syntax=tt

@@ -1,0 +1,425 @@
+#nop --
+#nop Class Definitions
+#nop --
+
+#var kallisti/mobs-description {Mob detection}
+#var kallisti/mobs-help {
+Detect mobs in a room.
+}
+
+#nop --
+#nop Modloader Stuff
+#nop --
+
+#alias kallisti/mobs-register {
+	#if {@isloaded{modloader}} {
+		register_module kallisti/mobs
+	} {
+		fail_module kallisti/mobs Need queues module
+	}
+}
+
+#alias read_mobs {
+    #nop %0;
+    #unvar mobs_data;
+    init mobs_data kallisti/mobs null;
+    #unvar mobsdb;
+    init mobsdb kallisti/mobs $db/kallisti:$MSDP_AREA_NAME.mob;
+    #class mobsdb kill;
+    init mobsKWHash mobsdb null;
+    init mobsPRHash mobsdb null;
+    #class {mobsdb} {read} {$mobsdb};
+}
+
+#alias {write_mobs} {#class {mobsdb} {write} {$db/kallisti:$MSDP_AREA_NAME.mob}}
+
+event_register {variable MSDP_AREA_NAME} {kallisti/mobs} {read_mobs};
+
+
+#nop -- ---------------------------------------------------------------
+#nop -- Actions
+#nop -- ---------------------------------------------------------------
+
+
+
+#nop -- try this to turn on mobcap due to blankline
+#nop #action {                                                            |} {
+    #if {$mobCap==0} {#var mobCap 1}
+}
+
+#action {^< $MSDP_CHARACTER_NAME %1>$} {event_raise prompt}
+
+#nop #action {^$} {event_raise blankline};
+
+#nop -- #action {~^\e\[{(0;37m\e\[)?}1;37m{.*?( \[.*?])?}{( \[.*?\])?}{( \[.*?\])?}$} ;
+
+#action {~^\e\[{(0;37m\e\[)?}1;37m{(.*?)( \[(.*?)\])?( \[ (.*?) \])?( \[(.*?)\])?}$} {
+    
+    #line strip #var _clean %0;
+    #replace _clean {[} {;};
+    #replace _clean {]} {;};
+    #replace _clean { ;} {;};
+    #replace _clean {;;} {;};
+    #showme mob>>$_clean;
+    #list {mlList} {create} {$_clean};
+    #var mlList;
+    #nop -- A tunnel protector is here, serving the forces that be. [4] [36200];
+
+} {2}
+
+#nop -- action 1, gets the mob on the first line 
+#action {~^\e\[1;37m%1$} {
+    #if {$mobCap==1} {
+        debug mobs Match new line (action 1);
+        #line strip #var cleanML %1;
+        #replace cleanML {[} {;};
+        #replace cleanML {]} {;};
+        #replace cleanML { ;} {;};
+        #replace cleanML {;;} {;};
+        #list {mlList} {create} {$cleanML};
+        #format {mLong} {%p} {$mlList[1]};
+        #switch {&mlList[]} {
+            #case {3} {
+                #if {@isD{$mlList[3]}} {
+                    #var n_mobs $mlList[3];
+                    #var flag_tmp @isRanged{$mlList[2]};
+                    addMobs $n_mobs $mLong $flag_tmp
+                };
+                #else {
+                    #var n_mobs $mlList[2];
+                    #var flag_tmp @isRanged{$mlList[3]};
+                    addMobs $n_mobs $mLong $flag_tmp
+                };
+            };
+            #case {2} {
+                #if @isD{$mlList[2]} {
+                    debug mobs Second bracket set is number;
+                    #var n_mobs $mlList[2];
+                    #var @isRanged{$mlList[1]};
+                    addMobs $n_mobs $mLong $flag_tmp
+                };
+                #else {
+                    #var n_mobs 1;
+                    #var flag_tmp @isRanged{$mlList[2]};
+                    debug mobs Flag_tmp is $flag_tmp;
+                    addMobs $n_mobs $mLong $flag_tmp
+                };
+            };
+            #case {1} {
+                #var n_mobs 1;
+                #var flag_tmp default;
+                addMobs $n_mobs $mLong $flag_tmp
+            };
+        };clear_matches
+    }
+}
+#nop -- action 2, gets mobs on 2nd, 3rd, following lines
+#action {~^\e\[0;37m\e\[1;37m%1$} {  
+    #if {$mobCap==1} {  
+        debug mobs Match new line (action 2);
+        #line strip #var cleanML %1;
+        debug mobs Mob capture: $cleanML;
+        #replace cleanML {[} {;};
+        #replace cleanML {]} {;};
+        #replace cleanML { ;} {;};
+        #replace cleanML {;;} {;};
+        #list {mlList} {create} {$cleanML};
+        #format {mLong} {%p} {$mlList[1]};
+        #switch {&mlList[]} {
+            #case {3} {
+                #if {@isD{$mlList[3]}} {
+                    #var n_mobs $mlList[3];
+                    #var flag_tmp @isRanged{$mlList[2]};
+                    addMobs $n_mobs $mLong $flag_tmp
+                };
+                #else {
+                    #var n_mobs $mlList[2];
+                    #var flag_tmp @isRanged{$mlList[3]};
+                    addMobs $n_mobs $mLong $flag_tmp
+                };
+            };
+            #case {2} {
+                #if @isD{$mlList[2]} {
+                    debug mobs Second bracket set is number;
+                    #var n_mobs $mlList[2];
+                    #var flag_tmp @isRanged{$mlList[1]};
+                    addMobs $n_mobs $mLong $flag_tmp
+                };
+                #else {debug mobs Second bracket set is word: $mlList[2];
+                    #var n_mobs 1;
+                    #var flag_tmp @isRanged{$mlList[2]};
+                    debug mobs Flag_tmp is $flag_tmp;
+                    addMobs $n_mobs $mLong $flag_tmp
+                };
+            };
+            #case {1} {
+                #var n_mobs 1;
+                #var flag_tmp default;
+                addMobs $n_mobs $mLong $flag_tmp
+            };
+        };clear_matches
+    }
+}
+
+#nop -- ---------------------------------------------------------------
+#nop -- Aliases
+#nop -- ---------------------------------------------------------------
+
+#nop -- Add mobs to list. Note that mobsInRoom is a list of arrays, with the first value
+#nop -- being the mob priority. So, mobsInRoom[1] contains all priority 1 mobs, mobsInRoom[2]
+#nop -- priority 2 mobs, and so on. This gives us unlimited priorities. We'll use it to 
+#nop -- iterate from highest to lowest priority when we do attack.
+
+#nop -- for some fucking reason we're passing %0 from our action match, just like we used to
+#nop -- with events in tdome.
+#alias {addMobs} {
+    #nop %0;
+    #loop {1} {$n_mobs} {add_idx} {
+        #list mobsInRoom[@mobsPRFromLong{$mLong}] add $mLong;
+        #list flagsInRoom[@mobsPRFromLong{$mLong}] add $flag_tmp;
+    }
+}
+
+#alias {clearMobCap} {
+    #nop %0;
+    #if {$mobCap==1} {#var mobCap 0}
+}
+
+#action {~^\e\[1;35m%1%s\e} {
+    mobsClearList {%1}.
+}
+
+#nop -- clear lists each time we look at a room
+#alias mobsClearList {
+    #nop %0;
+    debug mobs Clearing mobs list;
+    #list {mobsInRoom} {clear};
+    #list {flagsInRoom} {clear};
+    #var mobCap 1;
+    debug mobs setting mobCap to 1;
+}
+
+#nop -- shows mobs, keyword, priority, flags (supports ranged/default)
+#tab showMobs
+#alias {showMobs} {
+    #if {&mobsInRoom[]>0} {
+        #var _j 0;
+        #var _i 0;
+        #var totInRoom 0;
+        #echo {<170>Num    Mobs in Room                             KeyW  Pr   AttType};
+        #echo {-------------------------------------------------------------------};
+        #foreach {*mobsInRoom[%*]} {_i} {
+            #foreach {$mobsInRoom[$_i][%*]} {_j} {
+                #math totInRoom $totInRoom+1;
+                #var _kw {@mobsKWFromLong{$_j}};
+                #var _pr {@mobsPRFromLong{$_j}};
+                #var _fl $flagsInRoom[$_i][@getFlag{$_i;$_j}];
+                #format {mobLine} {[%+2s] <370><dca>%-42.42s<070> (<170>%.3s<070>) (%s<070>) [%s]}
+                    {$totInRoom} {$_j} {$_kw} {@prColor{$_pr}} {$_fl};
+                #echo {$mobLine}
+            };
+        };
+        info mobs To add a mob to the DB use: 'DBAddMob' <mobnumber> <keyw> <priority>;
+        info mobs To remove a mob, use: 'DBRemoveMob' <mobnumber>
+    } {
+       info mobs There are no mobs in the room.;
+        #cr
+    }
+}
+
+#nop -- Adds a mob to the database. Stores keyword and priority. 
+#nop -- info is an echo utility I wrote, replace with an echo if you want
+#tab DBAddMob
+#alias {DBAddMob} {
+    #if {"%1"!="" && "%2"!="" && "%3"!=""} {
+        #var {roomIndex} {%1};
+        #var {keyw_tmp} {%2};
+        #var {pr_tmp} {%3};
+        #var totInRoom 0;
+        #foreach {*mobsInRoom[%*]} {_i} {
+            #foreach {$mobsInRoom[$_i][%*]} {_j} {
+                #math totInRoom $totInRoom+1;
+                #if {$roomIndex==$totInRoom} {
+                    #var mobsKWHash[@hash{$_j}] $keyw_tmp;
+                    #var mobsPRHash[@hash{$_j}] $pr_tmp;
+                    write_mobs;
+                    #format {addMob} {%.42s} {$_j};
+                    info mobs Mob $addMob with key '$keyw_tmp' added to DB.
+                }
+            }
+        };
+    } {
+        info mobs You must provide 3 arguments, type showMobs for help.
+    }
+}
+
+#tab DBRemoveMob
+#alias {DBRemoveMob} {
+    #var totInRoom 0;
+    #if {"%1"!=""} {
+        #foreach {*mobsInRoom[%*]} {_i} {
+            #foreach {$mobsInRoom[$_i][%*]} {_j} {
+                #math totInRoom $totInRoom+1;
+                #if {"%1"=="$totInRoom"} {debug mobs checking $_j;
+                    #if {&mobsKWHash[@hash{$_j}]} {
+                        #unvar mobsKWHash[@hash{$_j}];
+                        #unvar mobsPRHash[@hash{$_j}];
+                        #format {remMob}  {%.42s} {$_j};
+                        write_mobs;
+                        info mobs Mob $remMob removed from database.
+                    } {
+                        info mobs Mob not in database.
+                    };
+                };
+            };
+        };
+    } {
+        info mobs You must provide the mob in room number.
+    };
+}
+
+
+#nop -- iterates through mobsInRoom, attacking if we have a valid keyword. If we come to the end
+#nop -- of a priority section we clear that priority.
+#alias {mobAttack} {
+    #if {&mobsInRoom[]>0} {
+        #if {"$MSDP_POSITION"!="fighting"} {
+            #foreach {*mobsInRoom[%*]} {_mir} {
+                #if {&mobsInRoom[$_mir][1]} {
+                    #if {"@mobsKWFromLong{$mobsInRoom[$_mir][1]}"!="null"} {
+                        #line sub {vars;func} {$openingAttack[$flagsInRoom[$_mir][1]] @mobsKWFromLong{$mobsInRoom[$_mir][1]}};
+                        debug mobs doing attack;
+                        #list mobsInRoom[$_mir] delete 1;
+                        debug mobs doing mobs in room $_mir delete spot 1;
+                        #if {&mobsInRoom[$_mir][1]==0} {#list mobsInRoom delete $_mir;debug mobs doing pr list delete};
+                        #list flagsInRoom[$_mir] delete 1;
+                        #if {&flagsInRoom[$_mir][1]==0} {#list flagsInRoom delete $_mir;debug mobs doing flags list delete};
+                        #break;
+                    };
+                };
+            };
+        } {
+            info mobs Fighting, not attacking.
+        };
+    } {
+        info mobs No mobs in room.
+    };
+}
+
+
+#nop -- ---------------------------------------------------------------
+#nop -- Events
+#nop -- ---------------------------------------------------------------
+
+#nop -- We put blankline event raise in this script because we didn't have it
+#nop -- anywhere else.
+
+event_register {prompt} {clearMobCap} {clearMobCap}
+event_register {mapEnterRoom} {mobsClearList} {mobsClearList}
+#nop event_register {statusUpdate} {updateMobLine} {updateMobLine}
+#nop event_register {blankline} {clearMobCap} {clearMobCap}
+#nop -- ---------------------------------------------------------------
+#nop -- Macros
+#nop -- ---------------------------------------------------------------
+
+#macro {OQ} {mobAttack}
+
+#nop -- ---------------------------------------------------------------
+#nop -- Functions
+#nop -- ---------------------------------------------------------------
+
+#nop -- returns keyword, if one exists, null if none
+#function mobsKWFromLong {
+    #format _mktmp {%H} {%0};
+    #if {&mobsKWHash[$_mktmp]} {
+        #var result $mobsKWHash[$_mktmp]
+    } {
+        #var result null
+    }
+}
+
+#function killableMobs {
+    #var result 0;
+    #foreach {*mobsInRoom[%*]} {_km} {
+        #foreach {$mobsInRoom[$_km]} {_kkm} {
+            #var KW_tmp @mobsKWFromLong{$_kkm};
+            #if {"$KW_tmp"!="null"} {
+                #return 1
+            };
+        }
+    }
+}
+
+#nop -- priority colors
+#function {prColor} {
+    #if {%1<2} {#return <118>%1};
+    #if {%1<3} {#return <138>%1};
+    #return <148>%1
+}
+
+#nop -- returns priority, if one exists, 1 (highest) if none
+#function mobsPRFromLong {
+    #format _mptmp {%H} {%0};
+    #if {&mobsPRHash[$_mptmp]} {
+        #var result $mobsPRHash[$_mptmp]
+    } {
+        #var result 1
+    }
+}
+
+#nop -- due to the fucky way I stored flags, I need this to get the index
+#nop -- of the flag from teh mob long desc
+
+#function {getFlag} {
+    #list {mobsInRoom[%1]} {find} {%2} {result}
+}
+
+#function hash { #format {result} {%H} {%0}; }
+
+#function cleanName {#var result %1; #replace {result} {;} {}};
+
+#nop -- tells us if a mob is ranged, should be moved to functions.tin
+#function isRanged {
+	#var result default;
+    #regexp {"%1"} {ranged} {
+		debug mobs is ranged, returning ranged;
+		#var result ranged
+		} {
+	debug mobs is not ranged, returning default;
+	#var result default
+	};
+}
+
+#nop -- tells us if something is a digit or not - removed as it's already in functions.tin
+#nop -- isD
+
+#nop -- gives prefix for mobsdb file 
+#function mobDBname {
+    #var result $MSDP_AREA_NAME;
+    #replace result { } {_};
+    #replace result {/} {_};
+    #var result ${result}_
+}
+
+#nop -- don't think we need this anymore, but we haven't tested it without
+#alias {clear_matches} {
+    #nop %0 %1 %2 %3 %4 %5 %6 %7 %8 %9;
+    #unvar mob_line;
+    #unvar n_mobsIR;
+    #unvar flagline_tmp
+}
+
+#nop #function killableMobs {
+    #var result 0;
+    #if {&mobsInRoom[]>0} {
+        #foreach {*mobsInRoom[%*]} {_i} {
+            #if {&mobsInRoom[$_i][1]} {
+                #if {"@mobsKWFromLong{$mobsInRoom[$_i][1]}"!="null"} {
+                    #return 1
+                }
+            }
+        }
+    }
+}
+
+read_mobs

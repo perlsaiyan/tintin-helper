@@ -166,6 +166,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 }
 
 #alias doTruesee {
+    #nop %0;
     #switch {"$MSDP_CLASS"} {
         #case {"Prophet"} {queueAdd nco {true}};
         #case {"Druid"} {queueAdd nco {true}};
