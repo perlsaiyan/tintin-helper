@@ -30,8 +30,8 @@ init comms-session comms;
 #info sessions save;
 #if {!&info[SESSIONS][${comms-session}]} {
 	#line quiet #port {init} {${comms-session}} {0};
+	#untick {idle};
 	#ses -;
-	#${comms-session} {#untick idle};
 }
 
 #${comms-session} #macro {OP} {#ses kallisti:${char_name}};
