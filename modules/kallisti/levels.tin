@@ -222,7 +222,7 @@ Usage: levelreq <startlevel> <endlevel>}
 #var herolevel[97] 24600
 #var herolevel[98] 24900
 #var herolevel[99] 25200
-#var herolevel[100] 25500
+#var herolevel[100] 25555
 #var goldlevel[1] 0
 #var goldlevel[2] 0
 #var goldlevel[3] 0
