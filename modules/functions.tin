@@ -246,6 +246,14 @@
     #return 0
 }
 
+#function is_session {
+	#info sessions save;
+	#foreach *info[SESSIONS][] _ses {
+		#if {"$_ses" == "%1"} {#return 1}
+	};
+	#return 0
+}
+
 #function is_ticker {
     #info ticker save;
     #var result 0;
