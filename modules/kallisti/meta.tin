@@ -67,7 +67,7 @@ init metaHero preferences 0
 #list metaHerosPer[Priest] create 1.80 2.01 0.85
 #list metaHerosPer[Templar] create 2.0 2.2 1.0
 #list metaHerosPer[Druid] create 1.9 2.35 0.95
-#list metaHerosPer[Prophet] create 1.70 2.81 0.85
+#list metaHerosPer[Prophet] create 1.70 2.80 0.85
 
 #list metaHerosPer[Necromancer] create 1.75 2.8 0.8
 #list metaHerosPer[Wizard] create 1.75 2.8 0.8
