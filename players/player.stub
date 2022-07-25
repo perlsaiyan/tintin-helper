@@ -1,6 +1,16 @@
 #nop Sample player file
 
-#list modules_on_connect create layout kallisti kal_comms;
+#list modules_on_connect create {};
 
+#nop simplify adding kallisti modules
+
+#var account_name <account name>
+#var layout_preference full
+#var comms-session com
+
+#var char_name <character name>
+
+#nop if you want logging;
+log on
 
 #nop vim: syntax=tt
