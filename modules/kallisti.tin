@@ -46,7 +46,7 @@
 	};
 
 	info kallisti Loading kallisti modules;
-	#foreach {autobuf;autoheal;levels;meta;odometer;playermap} tmp {
+	#foreach {autobuf;levels;meta;odometer;playermap} tmp {
 		load_module kallisti/$tmp
 	};
 	#line oneshot #tick {clear} {#buffer end} {0.5};
@@ -119,4 +119,11 @@ event_register {variable MSDP_GROUP} {right} {generate_group_info {%0} {%1} {%2}
     }
 }
 
+#nop -- only one of the following is required, figure out which
+#action {~^\e[0m\e[0;32m< {\w+} |} {
+    event_raise {prompt} {%1}
+}
+#action {^< $MSDP_CHARACTER_NAME %1>$} {event_raise prompt}
+#action {^{[a-zA-Z ]+} {rides|flies|sneaks} in} {event_raise {entity arrival} {%1}}
+#
 #nop vim: syntax=tt
