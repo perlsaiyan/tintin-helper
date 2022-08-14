@@ -371,7 +371,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 	#switch {"$MSDP_CLASS"} {
 		#case {"Druid"} {
 			#if { (@epoch{} - $lastBless < $blessDelay) } { #return 1 } {#var lastBless @epoch{}};
-			#if { ("$autobark" == "on") } {
+			#if { ("$autobless" == "on") } {
 				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
 					#if {$MSDP_MANA > 100} {queueAdd nco {bless}}
 				} {
