@@ -35,7 +35,7 @@ even read a scroll, etc.
 
 #nop -- Preference Management --
 init sanctMethod preferences auto;
-#foreach {autoguardian;autobark;autostatic;autoaura;autogrim;autodshield;autoffire} {tmp} {
+#foreach {autobless;autoguardian;autobark;autostatic;autoaura;autogrim;autodshield;autoffire} {tmp} {
     init $tmp preferences off;
 }
 
