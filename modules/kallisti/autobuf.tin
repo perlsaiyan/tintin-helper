@@ -348,6 +348,21 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 	}
 }
 
+#alias doBless {
+	#switch {"$MSDP_CLASS"} {
+		#case {"Druid"} {
+			#if { ("$autobless" == "on") } {
+			    #if { @autobuf_check } {
+                        #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
+                            #if {$MSDP_MANA > 100} {queueAdd nco {bless}}
+                        } {
+                            #if {$MSDP_MANA > 40}  {queueAdd nco {bless}}
+                        }
+                }
+			}
+		};
+	}
+}
 
 
 
@@ -367,20 +382,6 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
     }
 }
 
-#alias doBless {
-	#switch {"$MSDP_CLASS"} {
-		#case {"Druid"} {
-			#if { (@epoch{} - $lastBless < $blessDelay) } { #return 1 } {#var lastBless @epoch{}};
-			#if { ("$autobless" == "on") } {
-				#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
-					#if {$MSDP_MANA > 100} {queueAdd nco {bless}}
-				} {
-					#if {$MSDP_MANA > 40}  {queueAdd nco {bless}}
-				}
-			}
-		};
-	}
-}
 #alias sanctPotion {pg purple;quaff purple};
 
 
