@@ -50,7 +50,7 @@
 		load_module kallisti/$tmp
 	};
 	#line oneshot #tick {clear} {#buffer end} {0.5};
-	#if {@is_alias{player_setup}} {player_setup}
+	#if {@is_alias{player_setup}} {player_setup %1}
 }
 
 #act {^Enter your account name.} {
@@ -68,8 +68,8 @@
 
 #act {^                             *** PRESS ENTER ***} {#send motd;#send 3 $char_name;#send 1}
 
-#act {^Welcome to the legendary lands of Kallisti.} {post_connect_load}
-#act {^Reconnecting.} {post_connect_load}
+#act {^Welcome to the legendary lands of Kallisti.} {post_connect_load login}
+#act {^Reconnecting.} {post_connect_load reconnect}
 
 
 #nop -- Let's populate two tiles as samples as they're commonly asked for;
