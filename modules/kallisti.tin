@@ -50,6 +50,7 @@
 		load_module kallisti/$tmp
 	};
 	#line oneshot #tick {clear} {#buffer end} {0.5};
+	#if {@is_alias{player_setup}} {player_setup}
 }
 
 #act {^Enter your account name.} {
