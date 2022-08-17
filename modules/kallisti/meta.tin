@@ -27,6 +27,7 @@ init metaXPCost preferences 0
 init metaAUCost preferences 0
 init metaHero preferences 0
 
+#list metaGains[Immortal] create 1.0 1.0 1.0
 #list metaGains[Mage] create 3.5 5.5 3.5
 #list metaGains[Wizard] create 3.5 5.5 3.5
 #list metaGains[Necromancer] create 3.5 5.5 3.5
@@ -52,28 +53,32 @@ init metaHero preferences 0
 #list metaGains[Monk] create 5.0 3.0 5.0
 #list metaGains[Samurai] create 6.0 2.5 4.5
 
+#list metaHerosPer[Immortal] create 1.0 1.0 1.0
+
+#list metaHerosPer[Fighter] create 2.45 0.10 1.65
 #list metaHerosPer[Barbarian] create 2.45 0.1 1.65
 #list metaHerosPer[Paladin] create 2.3 1.5 1.3
-#list metaHerosPer[Dreadlord] create 2.3 1.5 1.3
+#list metaHerosPer[Dreadlord] create 2.3 1.3 1.5
 #list metaHerosPer[Ranger] create 2.3 1.3 1.5
-#list metaHerosPer[Fighter] create 2.45 0.10 1.65
 #list metaHerosPer[Valkyrie] create 2.3 1.5 1.3
 
 #list metaHerosPer[Rogue] create 2.40 0.10 1.70
 #list metaHerosPer[Assassin] create  2.4 0.1 1.7
-#list metaHerosPer[Demoniac] create 2.35 1.6 1.55
+#list metaHerosPer[Demoniac] create 2.25 1.6 1.55
 #list metaHerosPer[Bard] create 2.1 1.7 1.5
 
-#list metaHerosPer[Priest] create 1.80 2.01 0.85
+#list metaHerosPer[Priest] create 2.0 2.45 0.85
 #list metaHerosPer[Templar] create 2.0 2.2 1.0
 #list metaHerosPer[Druid] create 1.9 2.35 0.95
 #list metaHerosPer[Prophet] create 1.70 2.80 0.85
 
+#list metaHerosPer[Mage] create 1.75 2.8 0.8
 #list metaHerosPer[Necromancer] create 1.75 2.8 0.8
 #list metaHerosPer[Wizard] create 1.75 2.8 0.8
 
-#list metaHerosPer[Monk] create 2.3 1.45 1.5
-#list metaHerosPer[Samurai] create 2.4 0.55 1.45
+#list metaHerosPer[Monastic] create 2.4 1.4 1.5
+#list metaHerosPer[Monk] create 2.25 1.5 1.5
+#list metaHerosPer[Samurai] create 2.4 0.2 1.95
 
 
 
@@ -114,66 +119,94 @@ init metaHero preferences 0
 #nop -- ---------------------------------------------------------------
 #nop -- Autometa functions
 #nop -- ---------------------------------------------------------------
-#function metaHeroHit {#math result {$metaGains[$MSDP_CLASS][1] * $metaHerosPer[$MSDP_CLASS][1]}}
-#function metaHeroMana {#math result {$metaGains[$MSDP_CLASS][2] * $metaHerosPer[$MSDP_CLASS][2]}}
-#function metaHeroStam {#math result {$metaGains[$MSDP_CLASS][3] * $metaHerosPer[$MSDP_CLASS][3]}}
 #function one_meta_cost {
     #math {result} { ($metaXPCost[hp] + $metaXPCost[mana] + $metaXPCost[stam]) / 3};
 }
 #function estimated_metas {
     #math result {$MSDP_EXPERIENCE / @one_meta_cost{}}
 }
-
-#act {^HitPoints             : {\d+} exp & {\d+} coins : Current {\d+}$} {
-    #var metaXPCost[hp] %1; #var metaAUCost[hp] %2;
-    #math {metaHero[hp]} { $metaXPCost[hp] / @metaHeroHit{} };
-    #format _tmp {<028>HitPoints             : <078>%s <028>exp & <078>%s <028>coins : Current <078>%d<028> (<078>%s<028>/hero)}
-        {@hNum{%1}} {@hNum{%2}} {%3} {@hNum{$metaHero[hp]}};
-    #showme $_tmp;
-    #line gag
+#function metaHero {
+    #switch {"%1"} {
+        #case {"HitPoints"} {
+            #math _metaHH {$metaGains[$MSDP_CLASS][1] * $metaHerosPer[$MSDP_CLASS][1]};
+            #return $_metaHH
+        };
+        #case {"Mana"} {
+            #math _metaHM {$metaGains[$MSDP_CLASS][2] * $metaHerosPer[$MSDP_CLASS][2]};
+            #return $_metaHM
+        };
+        #case {"Stamina"} {
+            #math _metaHS {$metaGains[$MSDP_CLASS][3] * $metaHerosPer[$MSDP_CLASS][3]};
+            #return $_metaHS
+        }
     }
-
-#act {^ManaPoints            : {\d+} exp & {\d+} coins : Current {\d+}$} {
-    #var metaXPCost[mana] %1; #var metaAUCost[mana] %2;
-    #math {metaHero[mana]} {$metaXPCost[mana] / @metaHeroMana{} };
-    #format _tmp {<028>ManaPoints            : <078>%s <028>exp & <078>%s <028>coins : Current <078>%d<028> (<078>%s<028>/hero)}
-        {@hNum{%1}} {@hNum{%2}} {%3} {@hNum{$metaHero[mana]}};
-    #showme $_tmp;
-    #line gag
-    }
-
-#act {^Stamina               : {\d+} exp & {\d+} coins : Current {\d+}$} {
-    #var metaXPCost[stam] %1; #var metaAUCost[stam] %2;
-    #math {metaHero[stam]} {$metaXPCost[stam] / @metaHeroStam{} };
-    #format _tmp {<028>Stamina               : <078>%s <028>exp & <078>%s <028>coins : Current <078>%d<028> (<078>%s<028>/hero)}
-        {@hNum{%1}} {@hNum{%2}} {%3} {@hNum{$metaHero[stam]}};
-    #showme $_tmp;
-    #line gag
-    }
-
-#act {^You can buy:} {#line oneshot #tick {meta advice} {show_meta_advice} {0.5}}
-
-#tab show_meta_advice
-#alias {show_meta_advice} {
-    #if { ($metaHero[hp] < $metaHero[stam]) & ($metaHero[hp] < $metaHero[mana])} {
-        #showme <f81a2b3>Meta HITPOINT for the most heros per experience point
-    };
-    #elseif { ($metaHero[mana] < $metaHero[hp]) & ($metaHero[mana] < $metaHero[stam])} {
-        #showme <f81a2b3>Meta MANA for the most heros per experience point
-    };
-    #elseif { ($metaHero[stam] < $metaHero[hp]) & ($metaHero[stam] < $metaHero[mana])} {
-        #showme <f81a2b3>Meta STAMINA for the most heros per experience point
-    };
-    #else {syslog meta warn Unable to provide meta advice, need meta values for this class.}
 }
 
-#action {^Meta %1 for the most heros per experience point} {
-	#if {"$autometa" != "on"} { #return; };
-    #switch {"%1"} {
-        #case {"HITPOINT"} {buy hit};
-        #case {"MANA"} {buy mana};
-        #case {"STAMINA"} {buy stam};
+
+#alias autometa {
+    #var autometa on;
+    list
+}
+
+#action {^Welcome to the Meta shop where you can enhance yourself in miraculous ways!$} {
+    #var meta_screen 1;
+    #var meta_borders 0
+}
+
+#action {^================================================================================$} {
+    #if {$meta_screen == 1} {
+        #if {$meta_borders == 1} {
+            #var meta_screen 0;
+            recMeta
+        };
+        #else {
+            #var meta_borders 1
+        }
+    }
+}
+
+#action {{^Max(\w+) \[*.+\]\s+(\d+)\s+(\d+)\s+\d+\s+\d+\s+[0-9\.]+ avg$}} {
+    #nop h/m/s = %2, exp = %3, au = %4;
+    #var metaXPCost[%2] %3;
+    #var metaAUCost[%2] %4;
+    #math {metaHero[%2]} { $metaXPCost[%2] / @metaHero{%2} };
+}
+
+#alias {recMeta} {
+    #if { ($metaHero[HitPoints] < $metaHero[Stamina]) & ($metaHero[HitPoints] < $metaHero[Mana])} {
+        #var meta_rec HitPoints
     };
+    #elseif { ($metaHero[Mana] < $metaHero[HitPoints]) & ($metaHero[Mana] < $metaHero[Stamina])} {
+        #var meta_rec Mana
+    };
+    #elseif { ($metaHero[Stamina] < $metaHero[HitPoints]) & ($metaHero[Stamina] < $metaHero[Mana])} {
+        #var meta_rec Stamina
+    };
+    #else {
+        #var meta_rec None
+    };
+    #if {"$meta_rec"=="None"} {
+        #show {<028>Unable to provide meta advice, check values in meta.tin.}
+    };
+    #else {
+        #showme $metaHero[HitPoints] | $metaHero[Mana] | $metaHero[Stamina];
+        #format {metarec_line} {%%80s} {<028>Meta <128>$meta_rec <028>for the most herps per experience point. <068>(@hNum{$metaHero[$meta_rec]} / per)};
+        #showme {$metarec_line};
+        _conditional_meta $meta_rec
+    };
+    #if {"$auto[meta]" == "on"} {
+        meta $meta_rec
+    }
+}
+
+#alias _conditional_meta {
+    #if {&{MSDP_HERO_POINTS} && "$autometa" == "on" && ${MSDP_HERO_POINTS} < $TARGET_HEROS} {
+        buy %1;
+        list
+    } {
+        #showme <cca>AUTOMETA DISABLED.;
+        #var autometa off
+    }
 }
 
 
