@@ -375,4 +375,13 @@ Usage: levelreq <startlevel> <endlevel>}
 	}
 }
 
+#function xpbanksize {
+    #if {$MSDP_LEVEL > 94} {
+     #var result 4294967295
+    } {
+        #math xpfoo {$MSDP_LEVEL + 1};
+        #math result { $explevel[$xpfoo] * 5};
+    }
+}
+
 #nop vim: syntax=tt
