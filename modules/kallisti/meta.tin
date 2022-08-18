@@ -204,7 +204,11 @@ init metaHero preferences 0
         buy %1;
         list
     } {
-        #showme <cca>AUTOMETA DISABLED.;
+        #if {${MSDP_HERO_POINTS} > $TARGET_HEROS} {
+            #showme <cca>AUTOMETA DISABLED - reached $MSDP_HERO_POINTS hero points ($TARGET_HEROS is target).;
+        } {
+            #showme <cca>AUTOMETA DISABLED.;
+        }
         #var autometa off
     }
 }
