@@ -213,5 +213,8 @@ init metaHero preferences 0
     }
 }
 
+#act {^The meta-sage tells you 'You don't have enough gold.} {#var autometa off}
+#act {^The meta-sage tells you 'You don't have enough experience.} {#var autometa off}
+
 
 #nop -- vim: syntax=tt
