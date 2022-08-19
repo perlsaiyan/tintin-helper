@@ -22,7 +22,7 @@ Recharm followers, convenience commands.
 #action {^Renewing charm duration for %1 to %d hours.$} {
     #untick {charmm failer};
     #math {cdelay} { ( %2 - 2 ) * 75 };
-    #line oneshot #tick {recharm} {#tick {charmm failer} {charm_group} {20}} {$cdelay}
+    #class kallisti/followers assign #line oneshot #tick {recharm} {#class kallisti/followers assign #tick {charmm failer} {charm_group} {20}} {$cdelay}
 }
 
 #alias charm_group {
