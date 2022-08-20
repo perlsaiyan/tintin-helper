@@ -28,7 +28,7 @@ Recharm followers, convenience commands.
 #alias charm_group {
     #switch {"$MSDP_CLASS"} {
         #case {"Druid"} {nco friend group};
-        #default {error No recharm method for $MSDP_CLASS};
+        #default {err No recharm method for $MSDP_CLASS};
     };
 }
 
