@@ -215,7 +215,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 		#switch {"$MSDP_CLASS"} {
 			#case {"Druid"} {queueAdd nco {shapechange %1}};
 			#case {"Necromancer"} {queueAdd nco {mortify %1}};
-            #default { error autobuf No method for shapechange for $MSDP_CLASS}
+            #default { err autobuf No method for shapechange for $MSDP_CLASS}
 		};
     };
 };
@@ -312,7 +312,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 }
 
 #alias doUnholyAura {
-    #if {@autobuf_check{aura} && ("autoaura" == "on")} {
+    #if {@autobuf_check{aura} && ("$autoaura" == "on")} {
 	    #switch {"$MSDP_CLASS"} {
 	    	#case {"Dreadlord"} {
 	       		#if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 9) } {
