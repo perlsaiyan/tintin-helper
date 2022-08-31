@@ -98,7 +98,10 @@
 #function is_group_fighting {
 	#var result 0;
     #foreach *MSDP_GROUP[%*] {_idx} {
-        #if {"$MSDP_GROUP[$_idx][position]" == "Fighting"} {#var result 1}
+        #if {"$MSDP_GROUP[$_idx][position]" == "Fighting"} {
+            event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {fighting};
+            #var result 1
+        }
     };
 }
 
@@ -110,11 +113,30 @@
 
     #var cgm_check 1;
     #foreach *MSDP_GROUP[%*] {_idx} {
-        #regex {$MSDP_GROUP[$_idx][flags]} {-Knees-} {#var cgm_check 0};
-        #regex {$MSDP_GROUP[$_idx][flags]} {>BASH<} {#var cgm_check 0};
-        #if {"$MSDP_GROUP[$_idx][position]" == "Sitting"} {#var cgm_check 0};
-        #if {"$MSDP_GROUP[$_idx][position]" == "Resting"} {#var cgm_check 0};
-        #if {"$MSDP_GROUP[$_idx][position]" == "Sleeping"} {#var cgm_check 0};
+        #regex {$MSDP_GROUP[$_idx][flags]} {-Knees-} {
+            event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {knees};
+            #var cgm_check 0
+        };
+        #regex {$MSDP_GROUP[$_idx][flags]} {>BASH<} {
+            event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {bashed};
+            #var cgm_check 0
+        };
+        #if {"$MSDP_GROUP[$_idx][position]" == "Sitting"} {
+            event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {sitting};
+            #var cgm_check 0
+        };
+        #if {"$MSDP_GROUP[$_idx][position]" == "Resting"} {
+            event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {resting};
+            #var cgm_check 0
+        };
+        #if {"$MSDP_GROUP[$_idx][position]" == "Sleeping"} {
+            event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {sleeping};
+            #var cgm_check 0
+        };
+        #if {"$MSDP_GROUP[$_idx][position]" == "Entangled"} {
+            event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {entangled};
+            #var cgm_check 0
+        };
     };
     #return $cgm_check
 }
@@ -271,6 +293,5 @@
     };
     #return 0
 }
-
 
 #nop -- vim: syntax=tt
