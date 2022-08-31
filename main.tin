@@ -15,7 +15,7 @@
 #var log $ttd/log
 
 #nop point this at an optional local .tin to load at boot
-#var local_config {}
+#nop #var local_config {}
 
 #nop -- end config section
 
@@ -42,9 +42,7 @@ load_module kallisti
 #nop -- end module loading
 
 #nop -- load additional configuration
-#if {&local_config"} {
+#if {&local_config} {
 	#read $ttd/${local_config}
-};
-
-
+}
 #nop vim: syntax=tt
