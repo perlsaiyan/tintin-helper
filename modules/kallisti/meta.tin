@@ -120,7 +120,7 @@ init metaHero preferences 0
 #nop -- Autometa functions
 #nop -- ---------------------------------------------------------------
 #function one_meta_cost {
-    #math {result} { ($metaXPCost[hp] + $metaXPCost[mana] + $metaXPCost[stam]) / 3};
+    #math {result} { ($metaXPCost[HitPoints] + $metaXPCost[Mana] + $metaXPCost[Stamina]) / 3};
 }
 #function estimated_metas {
     #math result {$MSDP_EXPERIENCE / @one_meta_cost{}}
@@ -208,7 +208,7 @@ init metaHero preferences 0
             #showme <cca>AUTOMETA DISABLED - reached $MSDP_HERO_POINTS hero points ($TARGET_HEROS is target).;
         } {
             #showme <cca>AUTOMETA DISABLED.;
-        }
+        };
         #var autometa off
     }
 }

@@ -32,4 +32,14 @@ Recharm followers, convenience commands.
     };
 }
 
+#function groupAmILeader {                                                                                
+    #var result 0;
+    #loop {1} {&MSDP_GROUP[]} {index} {
+        #if { "$MSDP_GROUP[$index][name]" == "$MSDP_CHARACTER_NAME" } {
+            #if {$MSDP_GROUP[$index][is_leader] == 1} { #return 1 }
+        }
+    };
+    #return 0
+}
+
 

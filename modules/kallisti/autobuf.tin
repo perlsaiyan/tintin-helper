@@ -179,6 +179,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
     #switch {"%1"} {
 			#case {"auto"} { nco doSmartSanct};
             #case {"spell"} { nco doSpellSanct};
+            #case {"gt"} {nco gt all sanct group};
             #case {"potion"} {
                 #if {@is_alias{potion}} {
                         queueAdd nco {potion sanctuary}

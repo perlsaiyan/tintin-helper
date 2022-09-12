@@ -126,5 +126,7 @@ event_register {variable MSDP_GROUP} {right} {generate_group_info {%0} {%1} {%2}
 }
 #action {^< $MSDP_CHARACTER_NAME %1>$} {event_raise prompt}
 #action {^{[a-zA-Z ]+} {rides|flies|sneaks} in} {event_raise {entity arrival} {%1}}
-#
+
+#action {^%w starts following you.$} {event_raise {new follower} {%1}}
+
 #nop vim: syntax=tt
