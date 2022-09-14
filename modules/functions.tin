@@ -133,7 +133,7 @@
             event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {sleeping};
             #var cgm_check 0
         };
-        #if {"$MSDP_GROUP[$_idx][position]" == "Entangle"} {
+        #regex {$MSDP_GROUP[$_idx][flags]} {Entangle} {
             event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {entangle};
             #var cgm_check 0
         };
