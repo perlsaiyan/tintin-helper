@@ -29,7 +29,7 @@ even read a scroll, etc.
 	}
 }
 
-#tick {auto bufs} {autoBuf} {4}
+#tick {auto bufs} {autoBufPulse} {4}
 
 #var autobuf_delay 15;
 
@@ -116,6 +116,9 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 } 
 
 #nop -- End Preference Management--
+#alias autoBufPulse {
+    #if {"$MSDP_ROOM_VNUM" != "13200"} {autoBuf}
+}
 
 #alias autoBuf {
 
