@@ -98,7 +98,7 @@
 #function is_group_fighting {
 	#var result 0;
     #foreach *MSDP_GROUP[%*] {_idx} {
-        #if {"$MSDP_GROUP[$_idx][position]" == "Fighting"} {
+        #if {"$MSDP_GROUP[$_idx][position]" == "Fighting" && $MSDP_GROUP[$_idx][with_you] == 1} {
             event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {fighting};
             #var result 1
         }
@@ -121,22 +121,25 @@
             event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {bashed};
             #var cgm_check 0
         };
-        #if {"$MSDP_GROUP[$_idx][position]" == "Sitting"} {
-            event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {sitting};
-            #var cgm_check 0
-        };
-        #if {"$MSDP_GROUP[$_idx][position]" == "Resting"} {
-            event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {resting};
-            #var cgm_check 0
-        };
-        #if {"$MSDP_GROUP[$_idx][position]" == "Sleeping"} {
-            event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {sleeping};
-            #var cgm_check 0
-        };
-        #regex {$MSDP_GROUP[$_idx][flags]} {Entangle} {
-            event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {entangle};
-            #var cgm_check 0
-        };
+        #if {$MSDP_GROUP[$_idx][with_you] == 1} {
+            #if {"$MSDP_GROUP[$_idx][position]" == "Sitting"} {
+                event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {sitting};
+                #var cgm_check 0
+            };
+            #if {"$MSDP_GROUP[$_idx][position]" == "Resting"} {
+                event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {resting};
+                #var cgm_check 0
+            };
+            #if {"$MSDP_GROUP[$_idx][position]" == "Sleeping"} {
+                event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {sleeping};
+                #var cgm_check 0
+            };
+            #regex {$MSDP_GROUP[$_idx][flags]} {Entangle} {
+                event_raise {cgm failure} {$MSDP_GROUP[$_idx][name]} {entangle};
+                #var cgm_check 0
+            };
+        }
+        
     };
     #return $cgm_check
 }
