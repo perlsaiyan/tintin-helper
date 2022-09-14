@@ -2,8 +2,6 @@
 
 #list modules_on_connect create {};
 
-#nop simplify adding kallisti modules
-
 #var account_name <account name>
 #var layout_preference full
 #var comms-session com
