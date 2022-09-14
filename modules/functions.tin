@@ -170,9 +170,9 @@
 	#if { @mpoch{} < $spellLock } {#return};
     #if { @can_group_move{} } {
         #if { "%1" == "" } {
-            #path w
+            queueAdd move {#path w}
         } {
-            %1
+            queueAdd move {%1}
         }
     }
 }

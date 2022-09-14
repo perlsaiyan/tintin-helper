@@ -166,6 +166,7 @@ Combat queues clear at the end of combat automatically.\n
         #case {"fst"} #var result 3000;
         #case {"charge"} #var result 3000;
         #case {"smart_move"} #var result 250;
+        #case {"#path"} #var result 200;
         #case {"mobAttack"} #var result 8000;
         #case {"fkill"} #var result 5000;
         #case {"get"} #var result 500;
