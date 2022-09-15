@@ -297,4 +297,13 @@
     #return 0
 }
 
+#function parse_name_acct {
+    #local _res {};
+    #regex {%1} {%S (%S)} {
+        #if {"%2" == "account"} {#var _res &2};
+        #elseif {"%2" == "name"} {#var _res &1};
+        #else {#var _res &1};
+    };
+    #return $_res;
+}
 #nop -- vim: syntax=tt
