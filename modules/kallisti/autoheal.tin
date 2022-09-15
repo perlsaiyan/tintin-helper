@@ -57,6 +57,13 @@ event_register {variable MSDP_STAMINA} {autoheal} {autoheal};
                 }
             }
         };
+        #regex {$MSDP_GROUP[$_tmp][flag]} {Deaf} {
+            #if {$MSDP_GROUP[$_tmp][with_you] == 1} {
+                #if {"$reverb" == "on"} {
+                    nco reverb $MSDP_GROUP[$_tmp][name]
+                }
+            }
+        }
     };
     #if {"$mount_heal" == "on"} {
         #if {$MSDP_MOUNT_HEALTH_MAX > 0} {
