@@ -111,13 +111,15 @@ but no user interaction is needed.  Data is stored in MSDP_%*.
 			#variable {MSDP_%0} {@strip_ansi{%1}};
 		}
 	};
-	#variable {msdpOldList[%0]} {%1};
+
 
 	#nop -- Fire an event on MSDP variable updates;
 	#if {@isloaded{events}} {
 		syslog msdp debug event_raise {variable %0} {%1};
-		event_raise {variable MSDP_%0} {%1}
+		event_raise {variable MSDP_%0} {%1} {$msdpOldList[%0]}
 	};
+
+	#variable {msdpOldList[%0]} {%1};
 
 	#switch {"%0"}
 	{
