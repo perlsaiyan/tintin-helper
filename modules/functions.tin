@@ -255,7 +255,6 @@
 
 #function is_alias {
     #info aliases save;
-    #var result 0;
     #foreach {*info[ALIASES][%*]} {_tmp} {
         #if {"$info[ALIASES][$_tmp][arg1]" == "%1"} {#return $_tmp} 
     };
@@ -264,7 +263,6 @@
 
 #function is_function {
     #info function save;
-    #var result 0;
     #foreach {*info[FUNCTIONS][%*]} {_tmp} {
         #if {"$info[FUNCTIONS][$_tmp][arg1]" == "%1"} {#return $_tmp} 
     };
@@ -281,7 +279,6 @@
 
 #function is_ticker {
     #info ticker save;
-    #var result 0;
     #foreach {*info[TICKERS][%*]} {_tmp} {
         #if {"$info[TICKERS][$_tmp][arg1]" == "%1"} {#return $_tmp} 
     };
@@ -290,7 +287,6 @@
 
 #function is_variable {
     #info variable save;
-    #var result 0;
     #foreach {*info[VARIABLES][%*]} {_tmp} {
         #if {"$info[VARIABLES][$_tmp][arg1]" == "%1"} {#return $_tmp} 
     };
@@ -306,4 +302,26 @@
     };
     #return $_res;
 }
+
+#function groupIsPresent {                                                                                 
+    #loop {1} {&MSDP_GROUP[]} {index} {
+        #if { ("$MSDP_GROUP[$index][name]" == "%1" ) &&
+              ($MSDP_GROUP[$index][with_you] == 1 ) } {
+                #return 1;
+        }
+    };
+    #return 0;
+}
+
+#nop -- This uses the three letter combo thing
+#function groupClassIsPresent {                                                                                 
+    #loop {1} {&MSDP_GROUP[]} {index} {
+        #if { ("$MSDP_GROUP[$index][class]" == "%1" ) &&
+              ($MSDP_GROUP[$index][with_you] == 1 ) } {
+                #return 1;
+        }
+    };
+    #return 0;
+}
+
 #nop -- vim: syntax=tt

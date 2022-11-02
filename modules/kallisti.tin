@@ -35,6 +35,7 @@
 }
 
 #alias post_connect_load {
+    #showme %0;
 	info Loading post-connect modules;
 	load_module prefs;
 	load_module layout;
@@ -50,7 +51,7 @@
 		load_module kallisti/$tmp
 	};
 	#line oneshot #tick {clear} {#buffer end} {0.5};
-	#if {@is_alias{player_setup}} {player_setup %1}
+	#if {@is_alias{player_setup}} {player_setup %1};
 }
 
 #act {^Enter your account name.} {

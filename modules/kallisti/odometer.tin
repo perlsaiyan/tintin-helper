@@ -26,9 +26,40 @@ init _last_xp odometer ${MSDP_EXPERIENCE};
 
 #alias odometer {
 	#nop %0;
+	#var _meter[KILLS][${MSDP_WORLD_TIME}] 0;
 	#math {_meter[XP][${MSDP_WORLD_TIME}]} {${MSDP_EXPERIENCE} - ${_last_xp}};
 	#var _last_xp ${MSDP_EXPERIENCE};
 	update_xp_block
+}
+
+event_register {mob kill} {odometer} {odometer_kills};
+#alias odometer_kills {
+    #nop %0;
+    #math {_meter[KILLS][${MSDP_WORLD_TIME}]} {$_meter[KILLS][${MSDP_WORLD_TIME}] + 1};
+    #if {@sum_kills{} < 50 && &_meter[KILLS][] == 24} {
+        warn Kill count for 30 minutes below threshold: @sum_kills{}
+    }
+}
+
+#tab show_kills
+#alias show_kills {
+    #local _kills 0;
+    #local _gaps 0;
+    #foreach {*_meter[KILLS][%*]} {_t} {
+        #math {_kills} {$_kills + $_meter[KILLS][$_t]};
+        #if {$_meter[KILLS][%*] == 0} {
+            #math {_gaps} {$_gaps + 1};
+        };
+    };
+    gt $_kills kills over last &_meter[KILLS][] ticks, $_gaps gaps
+}
+
+#function sum_kills {
+    #local _kills 0;
+    #foreach {*_meter[KILLS][%*]} {_t} {
+        #math {_kills} {$_kills + $_meter[KILLS][$_t]};
+    };
+    #return $_kills
 }
 
 #tab show_xp
@@ -66,7 +97,7 @@ init _last_xp odometer ${MSDP_EXPERIENCE};
 		#math _ttl {($MSDP_EXPERIENCE_TNL / @avg_xp{}) * 75/60};
 		#var xp_block {$xp_block\nApprox. $_ttl mins to level}
 	} {
-		#var xp_block {$xp_block\nGO LEVEL!}
+		#var xp_block {$xp_block\nKill/hr: <188>@avg_kills_per_hour{}<088><F5f819d> over <188>&_meter[KILLS][%*]<088><F5f819d> ticks};
 	}
 }
 
@@ -76,6 +107,15 @@ init _last_xp odometer ${MSDP_EXPERIENCE};
 		#math {_total} {${_total} + ${tmp}}
 	};
 	#math {result} {48 * (1.00 *${_total}) / &{_meter[XP][]}};
+	#var result @hNum{$result}
+}
+
+#function avg_kills_per_hour {
+	#var _total 0;
+	#foreach {${_meter[KILLS][%*]}} {tmp}  {
+		#math {_total} {${_total} + ${tmp}}
+	};
+	#math {result} {48 * (1.00 *${_total}) / &{_meter[KILLS][]}};
 	#var result @hNum{$result}
 }
 

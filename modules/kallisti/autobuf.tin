@@ -85,7 +85,11 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
             #case {"shapechange"} {
                 autobuf_set_pref_specific {shapechange} %3 %4;
                 pref_handled
-            }
+            };
+            #case {"strength"} {
+                autobuf_set_pref_specific {strength} %3 %4;
+                pref_handled
+            };
         }
     }
 }
@@ -163,6 +167,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
             #case {"sanctuary"} {doSanctuary $_autobufs[%1][method]};
             #case {"shapechange"} {doShapechange $_autobufs[%1][method]};
             #case {"true seeing"} {doTruesee $_autobufs[%1][method]};
+            #case {"strength"} { doStrength $_autobufs[%1][method]};
             #default {err autobuf No autobuf_handler for %1}
         }
     }
@@ -177,6 +182,16 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
     };
 }
 
+#alias doStrength {
+    #nop %0;
+    #switch {"$MSDP_CLASS"} {
+        #case {"Mage"} {queueAdd nco {strength}};
+        #case {"Wizard"} {queueAdd nco {strength}};
+        #case {"Necromancer"} {queueAdd nco {strength}};
+        #case {"Prophet"} {queueAdd nco {strength}};
+        #default {err autobuf No class handler for 'strength'};
+    }
+}
 
 #alias doSanctuary {
     #switch {"%1"} {
@@ -379,10 +394,14 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 }
 
 #alias doSmartSanct {
-    #switch {"$MSDP_CLASS"} {
-        #case {"Prophet"} {doSpellSanct};
-        #case {"Templar"} {doSpellSanct};
-        #default {sanctPotion}
+    #if {@groupClassIsPresent{TEM}} {
+        gt all sanct group
+    } {
+        #switch {"$MSDP_CLASS"} {
+            #case {"Prophet"} {doSpellSanct};
+            #case {"Templar"} {doSpellSanct};
+            #default {sanctPotion}
+        }
     }
 }
 

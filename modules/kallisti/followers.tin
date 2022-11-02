@@ -17,7 +17,38 @@ Recharm followers, convenience commands.
 	}
 }
 
+init follower_mode preferences on
+
+event_register {commsGroup} {followers} {follower_command {%2} {%3} {%4}};
+
+
+#alias follower_command {
+    #if {"%1" == "@group_leader{}" && "$follower_mode" == "on"} {
+        #regex {%2} {^all %*$} {
+            #send &1;
+        }
+    } 
+}
+
+
 #alias oo {order followers %0}
+
+#action {^%w enters %2$} {
+    #var _portal %2;
+    #switch {"%2"} {
+        #case {"an earthen-tone portal."} {#var _portal {portal}};
+        #case {"a glowing blue-flame portal."} {#var _portal {portal}};
+        #case {"a spider-silkwool Zarkan tent."} {#var _portal {tent}};
+        #default {
+            #replace {_portal} {%w } {};
+            #replace {_portal} {.} {};
+        }
+    };
+	#if {"%1" == "@group_leader{}"} {
+		warn follower attempt to enter $_portal;
+		enter $_portal;
+	}
+}
 
 #action {^Renewing charm duration for %1 to %d hours.$} {
     #untick {charmm failer};
@@ -42,4 +73,10 @@ Recharm followers, convenience commands.
     #return 0
 }
 
+#function group_leader {
+    #loop {1} {&MSDP_GROUP[]} {index} {
+        #if {$MSDP_GROUP[$index][is_leader] == 1} {#return $MSDP_GROUP[$index][name]}
+    };
+    #return 0
+}
 

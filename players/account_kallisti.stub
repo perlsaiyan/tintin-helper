@@ -5,5 +5,6 @@
 #var account_name {}
 #var account_password {}
 
+#config {speedwalk} {on}
 
 #nop vim: syntax=tt
