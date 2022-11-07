@@ -30,8 +30,11 @@ event_register {commsGroup} {followers} {follower_command {%2} {%3} {%4}};
     } 
 }
 
-
 #alias oo {order followers %0}
+
+#action {^%w disappears.$} {
+    #if {"%1" == "@group_leader{}"} {recall}
+}
 
 #action {^%w enters %2$} {
     #var _portal %2;
@@ -49,6 +52,23 @@ event_register {commsGroup} {followers} {follower_command {%2} {%3} {%4}};
 		enter $_portal;
 	}
 }
+
+#action {^%w turns %2$} {
+
+    #var _portal %2;
+    #switch {"%2"} {
+        #case {"translucent."} {#return};
+        #default {
+            #replace {_portal} {%w } {};
+            #replace {_portal} {.} {};
+        };
+    };
+
+    #if {"%1" == "@groupLeader{}"} {
+        turn $_portal;
+    }
+}
+
 
 #action {^Renewing charm duration for %1 to %d hours.$} {
     #untick {charmm failer};
