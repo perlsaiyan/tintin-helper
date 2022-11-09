@@ -21,6 +21,7 @@ You can use the odometer_reset command to reset the XP counters.
 
 event_register {variable MSDP_WORLD_TIME} {odometer} {odometer};
 event_register {variable MSDP_UPTIME} {odometer} {odometer_uptime};
+event_register {level gain} {odometer} {odometer_reset};
 
 init _last_xp odometer ${MSDP_EXPERIENCE};
 
@@ -74,7 +75,9 @@ event_register {mob kill} {odometer} {odometer_kills};
 
 #tab odometer_reset
 #alias odometer_reset {
+	#nop %0;
 	#unvar _meter[XP];
+	#var _meter[KILLS] 0;
 	#var _last_xp ${MSDP_EXPERIENCE};
 	update_xp_block
 }
@@ -126,6 +129,16 @@ event_register {mob kill} {odometer} {odometer_kills};
 	};
 	#math {result} {(1.00 *${_total}) / &{_meter[XP][]}};
 }
+
+#al tnl {
+	#math _ttl {($MSDP_EXPERIENCE_TNL / @avg_xp{}) * 75/60};
+	gt XP: &0b@avg_xp_per_hour{}/hr&0e over last &0b&_meter[XP][%*]&0e ticks, Kills: &0b@avg_kills_per_hour{}&0e TNL: &0b@hNum{${MSDP_EXPERIENCE_TNL}}&0e, &0b$_ttl &0emins to level
+}
+
+#action {^--+  Congratulations, you are now level %d!} {
+	event_raise {level gain} {%1}
+}
+
 set_right_tile 4 <F5f819d> xp_block 2 tile;
 set_right_tile 5 <F5f819d> uptime_block 1 tile
 
