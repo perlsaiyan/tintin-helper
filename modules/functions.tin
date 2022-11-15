@@ -253,6 +253,7 @@
     }
 } {5}
 
+
 #function is_alias {
     #info aliases save;
     #foreach {*info[ALIASES][%*]} {_tmp} {
@@ -260,6 +261,15 @@
     };
     #return 0
 }
+
+#function is_class {
+    #info classes save;
+    #foreach {*info[CLASSES][%*]} {_tmp} {
+        #if {"$info[CLASSES][$_tmp][arg1]" == "%1"} {#return $_tmp}
+    };
+    #return 0
+}
+
 
 #function is_function {
     #info function save;
