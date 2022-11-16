@@ -38,8 +38,10 @@ event_register {commsGroup} {followers} {follower_command {%2} {%3} {%4}};
 #alias oo {order followers %0}
 
 #action {^%w disappears.$} {
-    #if {"%1" == "@group_leader{}"} {recall};
-    #if {&recall_special[@group_leader{}]} {$recall_special[@group_leader{}]}
+    #if {"%1" == "@group_leader{}"} {
+        recall;
+        #if {&recall_special[@group_leader{}]} {$recall_special[@group_leader{}]}
+    };
 }
 
 #action {^%w enters %2$} {
