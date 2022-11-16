@@ -57,12 +57,18 @@ event_register {variable MSDP_STAMINA} {autoheal} {autoheal};
                 }
             }
         };
-        #regex {$MSDP_GROUP[$_tmp][flag]} {Deaf} {
+        #regex {$MSDP_GROUP[$_tmp][flags]} {Deaf} {
             #if {$MSDP_GROUP[$_tmp][with_you] == 1} {
                 #if {"$reverb" == "on"} {
                     nco reverb $MSDP_GROUP[$_tmp][name]
                 }
             }
+        };
+        #regex {$MSDP_GROUP[$_tmp][flags]} {Paralyze} {
+            #if {"$remort[CURE]" == "1"} {queueAdd any cure $MSDP_GROUP[$_tmp][name]}
+        };
+        #regex {$MSDP_GROUP[$_tmp][flags]} {Poisoned} {
+            #if {"$remort[CURE]" == "1"} {queueAdd any cure $MSDP_GROUP[$_tmp][name]}
         }
     };
     #if {"$mount_heal" == "on"} {
