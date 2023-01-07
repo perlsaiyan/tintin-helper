@@ -22,6 +22,59 @@ Usage:\n
 	}
 }
 
+#nop simple toggle routine for on/off;
+#alias {toggle} {
+    #if {&toggle[%1]} {
+
+        #nop Regular toggle, no preference given;
+        #if {"%2" == ""} {
+            #if {"$toggle[%1]" == "on"} {
+                #var toggle[%1] off;
+                info preferences '%1' is now off;
+            } {
+                #var toggle[%1] on;
+                info preferences '%1' is now on;
+            }
+        } {
+            #switch {"%2"} {
+                #case {"on"} {#var toggle[%1] on; info preferences '%1' is now on};
+                #case {"off"} {#var toggle[%1] off; info preferences '%1' is now off};
+                #default {warn preferences Please specify on or off.}
+            }
+        }
+        _preferences_save
+    } {
+        warn preferences No toggle option for '%1'
+    }
+} {9}
+
+#alias {^toggle$} {
+    #var toggle
+} {8}
+
+#alias {^%w on$} {
+    #if {&toggle[%1]} {
+        toggle %1 on;
+        info preferences '%1' is now on;
+        _preferences_save
+    } {
+        warn preferences No toggle for %1;
+        %1
+    }
+}
+#alias {^%w off$} {
+    #if {&toggle[%1]} {
+        toggle %1 off;
+        info preferences '%1' is now on;
+        _preferences_save
+    } {
+        warn preferences No toggle for %1;
+        %1
+    }
+}
+
+
+
 #nop pref with no argument gives us all of our preferences
 #alias {^pref$} {
     #showme <188>All Preferences<088>;
