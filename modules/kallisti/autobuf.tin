@@ -35,6 +35,7 @@ even read a scroll, etc.
 
 #nop -- Preference Management --
 init sanctMethod preferences auto;
+init toggle[ranged] preferences off
 #foreach {autobless;autoguardian;autobark;autostatic;autoaura;autogrim;autodshield;autoffire} {tmp} {
     init $tmp preferences off;
 }
@@ -124,7 +125,12 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
     #if {"$MSDP_ROOM_VNUM" != "13200"} {autoBuf}
 }
 
+
 #alias autoBuf {
+
+    #if {$MSDP_RANGED == 0 && "$toggle[ranged]" == "on"} {
+            nco ranged
+    };
 
     #if {@hasAffect{haste} < 1} {
         #switch {"$MSDP_CLASS"} {
@@ -175,10 +181,20 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 
 #alias doTruesee {
     #nop %0;
-    #switch {"$MSDP_CLASS"} {
-        #case {"Prophet"} {queueAdd nco {true}};
-        #case {"Druid"} {queueAdd nco {true}};
-        #case {"Templar"} {queueAdd nco {true}};
+    #if {@hasAffect{true seeing} < 1} {
+        #switch {"$MSDP_CLASS"} {
+            #case {"Prophet"} {queueAdd nco {true}};
+            #case {"Druid"} {queueAdd nco {true}};
+            #case {"Templar"} {queueAdd nco {true}};
+            #default {
+                #if {"$remort[TRUE]" == "1"} {
+                    queueAdd nco {true}
+                };
+                #elseif {@groupClassIsPresent{TEM} || @groupClassIsPresent{PRO}} {
+                    queueAdd nco {gt all true $MSDP_CHARACTER_NAME}
+                }
+            }
+        };
     };
 }
 
@@ -394,13 +410,15 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 }
 
 #alias doSmartSanct {
-    #if {@groupClassIsPresent{TEM}} {
-        gt all sanct group
-    } {
-        #switch {"$MSDP_CLASS"} {
-            #case {"Prophet"} {doSpellSanct};
-            #case {"Templar"} {doSpellSanct};
-            #default {sanctPotion}
+    #switch {"$MSDP_CLASS"} {
+        #case {"Prophet"} {doSpellSanct};
+        #case {"Templar"} {doSpellSanct};
+        #default {
+            #if {@groupClassIsPresent{TEM} || @groupClassIsPresent{PRO}} {
+                queueAdd nco {gt all sanct group}
+            } {
+                sanctPotion
+            };
         }
     }
 }
