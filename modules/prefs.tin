@@ -49,7 +49,14 @@ Usage:\n
 } {9}
 
 #alias {^toggle$} {
-    #var toggle
+    #foreach {*toggle[%*]} tmp {
+        #if {"$toggle[$tmp]" == "on"} {
+            #format line {<ddf>%+20s <078>- <cfc>%s} {$tmp} {$toggle[$tmp]};
+        } {
+            #format line {<ddf>%+20s <078>- <fcc>%s} {$tmp} {$toggle[$tmp]};
+        }
+        #echo {$line}
+    }
 } {8}
 
 #alias {^%w on$} {
