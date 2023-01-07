@@ -18,6 +18,7 @@ Recharm followers, convenience commands.
 }
 
 init follower_mode preferences on
+init toggle[recallwithleader] preferences on
 
 event_register {commsGroup} {followers} {follower_command {%2} {%3} {%4}};
 
@@ -38,7 +39,7 @@ event_register {commsGroup} {followers} {follower_command {%2} {%3} {%4}};
 #alias oo {order followers %0}
 
 #action {^%w disappears.$} {
-    #if {"%1" == "@group_leader{}"} {
+    #if {"%1" == "@group_leader{}" && "$toggle[recallwithleader]" == "on"} {
         recall;
         #if {&recall_special[@group_leader{}]} {$recall_special[@group_leader{}]}
     };
@@ -64,6 +65,11 @@ event_register {commsGroup} {followers} {follower_command {%2} {%3} {%4}};
 #action {^%w turns %2$} {
 
     #var _portal %2;
+    
+    #switch {"%1"} {
+        #case {"Fortune"} {#return};
+    };
+
     #switch {"%2"} {
         #case {"translucent."} {#return};
         #default {
@@ -72,8 +78,8 @@ event_register {commsGroup} {followers} {follower_command {%2} {%3} {%4}};
         };
     };
 
-    warn %1 instructed to turn $_portal;
-    #if {"%1" == "@groupLeader{}"} {
+    warn follower %1 instructed to turn $_portal;
+    #if {"%1" == "@group_leader{}"} {
         turn $_portal;
     }
 }
