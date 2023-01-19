@@ -54,7 +54,7 @@ Usage:\n
             #format line {<ddf>%+20s <078>- <cfc>%s} {$tmp} {$toggle[$tmp]};
         } {
             #format line {<ddf>%+20s <078>- <fcc>%s} {$tmp} {$toggle[$tmp]};
-        }
+        };
         #echo {$line}
     }
 } {8}

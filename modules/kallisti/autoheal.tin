@@ -51,7 +51,8 @@ event_register {variable MSDP_STAMINA} {autoheal} {autoheal};
                     #nop
                 } {
                     #if {$MSDP_GROUP[$_tmp][with_you] == 1} {
-                        #nop -- refresh $MSDP_GROUP[$_tmp][name];
+                        #nop -- temporarily jack up the stamina to prevent double casing;
+                        #var MSDP_GROUP[$_tmp][stamina] 101;
                         queueAdd any {refresh $MSDP_GROUP[$_tmp][name]};
                     }
                 }
@@ -65,10 +66,13 @@ event_register {variable MSDP_STAMINA} {autoheal} {autoheal};
             }
         };
         #regex {$MSDP_GROUP[$_tmp][flags]} {Paralyze} {
-            #if {"$remort[CURE]" == "1"} {queueAdd any cure $MSDP_GROUP[$_tmp][name]}
+            #if {"$remort[CURE]" == "1" && @with_you{$MSDP_GROUP[%_tmp][name]}} {queueAdd any cure $MSDP_GROUP[$_tmp][name]}
         };
         #regex {$MSDP_GROUP[$_tmp][flags]} {Poisoned} {
-            #if {"$remort[CURE]" == "1"} {queueAdd any cure $MSDP_GROUP[$_tmp][name]}
+            #if {"$remort[CURE]" == "1" && @with_you{$MSDP_GROUP[%_tmp][name]}} {queueAdd any cure $MSDP_GROUP[$_tmp][name]}
+        };
+        #regex {$MSDP_GROUP[$_tmp][flags]} {Blind} {
+            #if {"$remort[CURE]" == "1" && @with_you{$MSDP_GROUP[%_tmp][name]}} {queueAdd any cure $MSDP_GROUP[$_tmp][name]}
         }
     };
     #if {"$mount_heal" == "on"} {
@@ -79,6 +83,10 @@ event_register {variable MSDP_STAMINA} {autoheal} {autoheal};
         };
     };
     
+}
+
+#action {^A feeling of energy fills you, fighting off the weariness you felt only a moment ago. (%d refreshed)} {
+    #nop
 }
 
 #function refreshBlacklist {#list {refreshBlack} {find} {%1} {result}}

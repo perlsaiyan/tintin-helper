@@ -36,6 +36,7 @@ even read a scroll, etc.
 #nop -- Preference Management --
 init sanctMethod preferences auto;
 init toggle[ranged] preferences off
+init toggle[tale] preferences off
 #foreach {autobless;autoguardian;autobark;autostatic;autoaura;autogrim;autodshield;autoffire} {tmp} {
     init $tmp preferences off;
 }
@@ -140,6 +141,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 
     #nop -- Affects that must exhaust completely;
     #if {@hasAffect{warcry} < 1} {doWarcry};
+    #if {@hasAffect{tale of valor} < 1} {doTaleOfValor};
 
     #if {@hasAffect{spiritual guardian} < 1} {doSpiritGuardian};
     #if {@hasAffect{divine shield} < 1} {doDivineShield};
@@ -264,6 +266,10 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
     #if { "$MSDP_CLASS" == "Barbarian" } { queueAdd any {warcry} }
 }
 
+#alias doTaleOfValor {
+    #if {"$toggle[tale]" == "on" && &MSDP_GROUP[] > 1} { queueAdd nco {tale}}
+}
+
 #alias doHasteSpell {
     #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
         #if {$MSDP_MANA > 160} {queueAdd nco {haste group}}
@@ -310,10 +316,16 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 
 #alias doVigor {
     #if {@autobuf_check{vigor} && ("$autovigor" == "on")} {
-        #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
-            #if {$MSDP_MANA > 100} {queueAdd nco {vigor group}}
+        #if {"$MSDP_CLASS" == "Prophet" || 
+                "$MSDP_CLASS" == "Druid" ||
+                "$MSDP_CLASS" == "Templar"} {
+            #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
+                #if {$MSDP_MANA > 100} {queueAdd nco {vigor group}}
+            } {
+                #if {$MSDP_MANA > 40}  {queueAdd nco {vigor}}
+            }
         } {
-            #if {$MSDP_MANA > 40}  {queueAdd nco {vigor}}
+            #if {&MSDP_GROUP[] > 1} {queueAdd nco gt all vigor group}
         }
     }
 }
@@ -410,15 +422,17 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 }
 
 #alias doSmartSanct {
-    #switch {"$MSDP_CLASS"} {
-        #case {"Prophet"} {doSpellSanct};
-        #case {"Templar"} {doSpellSanct};
-        #default {
-            #if {@groupClassIsPresent{TEM} || @groupClassIsPresent{PRO}} {
-                queueAdd nco {gt all sanct group}
-            } {
-                sanctPotion
-            };
+    #if {$remort[SANCT]} {doSpellSanct} {
+        #switch {"$MSDP_CLASS"} {
+            #case {"Prophet"} {doSpellSanct};
+            #case {"Templar"} {doSpellSanct};
+            #default {
+                #if {@groupClassIsPresent{TEM} || @groupClassIsPresent{PRO}} {
+                    queueAdd nco {gt all sanct group}
+                } {
+                    sanctPotion
+                };
+            }
         }
     }
 }
