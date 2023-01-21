@@ -37,9 +37,6 @@ event_register {mob kill} {odometer} {odometer_kills};
 #alias odometer_kills {
     #nop %0;
     #math {_meter[KILLS][${MSDP_WORLD_TIME}]} {$_meter[KILLS][${MSDP_WORLD_TIME}] + 1};
-    #if {@sum_kills{} < 50 && &_meter[KILLS][] == 24} {
-        warn Kill count for 30 minutes below threshold: @sum_kills{}
-    }
 }
 
 #tab show_kills
