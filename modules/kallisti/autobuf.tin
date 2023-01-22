@@ -37,7 +37,10 @@ even read a scroll, etc.
 init sanctMethod preferences auto;
 init toggle[ranged] preferences off
 init toggle[tale] preferences off
-#foreach {autobless;autoguardian;autobark;autostatic;autoaura;autogrim;autodshield;autoffire} {tmp} {
+init toggle[guardian] preferences off
+init toggle[bladebarrier] preferences off
+
+#foreach {autobless;autobark;autostatic;autoaura;autogrim;autodshield;autoffire} {tmp} {
     init $tmp preferences off;
 }
 
@@ -300,17 +303,14 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 }
 
 #alias doSpiritGuardian {
-    #if {@autobuf_check{guardian} && ("$autoguardian" == "on"} {
-        #if { ("$MSDP_CLASS" == "Templar") || ( "$MSDP_CLASS" == "Prophet") } {
-            #if {$MSDP_MANA > 40}  {queueAdd nco {spirit}};
-        }
+    #if {@autobuf_check{guardian} && ("$toggle[guardian]" == "on")} {
+        #if {$MSDP_MANA > 40}  {queueAdd nco {spirit}}
     }
 }
+
 #alias doBladeBarrier {
-    #if {@autobuf_check{blade barrier} && ("$autoblade" == "on")} {
-        #if {"$MSDP_CLASS" == "Templar"} {
-            #if {$MSDP_MANA > 40}  {queueAdd nco {blade}};
-        }
+    #if {@autobuf_check{blade barrier} && ("$toggle[bladebarrier]" == "on")} {
+        #if {$MSDP_MANA > 40}  {queueAdd nco {blade}};
     }
 }
 
