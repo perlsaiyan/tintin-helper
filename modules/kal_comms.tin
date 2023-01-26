@@ -137,6 +137,23 @@ init comms-session comms;
 	event_raise {commsSay} {%1} {%3} {%0};
 }
 
+#action {^<Hero: %w ({.*})> '%3'$} {
+	event_raise {commsHero} {%1 (%2)} {%3} {%0};
+}
+
+#action {^<Hero: %w> '{.*}'$} {
+	event_raise {commsHero} {%1} {%3} {%0};
+}
+
+#action {^<Advice: %w ({.*})> '{.*}'$} {
+	event_raise {commsAdvice} {%1 (%2)} {%3} {%0};
+}
+
+#action {^<Advice: %w> '{.*}'$} {
+	event_raise {commsAdvice} {%1} {%3} {%0};
+}
+
+
 #nop -- ---------------------------------------------------------------
 #nop -- Events
 #nop -- ---------------------------------------------------------------
@@ -148,6 +165,7 @@ event_register {commsWorld} {kal_comms} {update_chat world {%3}};
 event_register {commsDev}   {kal_comms} {update_chat dev {%4}};
 event_register {commsChat}  {kal_comms} {update_chat chat {%3}};
 event_register {commsSay}   {kal_comms} {update_chat say {%4}};
-
+event_register {commsHero}  {kal_comms} {update_chat hero {%4}};
+event_register {commsAdvice}{kal_comms} {update_chat advice {%4}};
 
 #nop -- vim: syntax=tt
