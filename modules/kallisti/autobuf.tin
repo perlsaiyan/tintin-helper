@@ -35,10 +35,13 @@ even read a scroll, etc.
 
 #nop -- Preference Management --
 init sanctMethod preferences auto;
-init toggle[ranged] preferences off
-init toggle[tale] preferences off
-init toggle[guardian] preferences off
-init toggle[bladebarrier] preferences off
+init toggle[ranged] preferences off;
+init toggle[tale] preferences off;
+init toggle[guardian] preferences off;
+init toggle[bladebarrier] preferences off;
+init focusStat preferences dex;
+init toggle[focus] preferences off;
+
 
 #foreach {autobless;autobark;autostatic;autoaura;autogrim;autodshield;autoffire} {tmp} {
     init $tmp preferences off;
@@ -65,7 +68,8 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
         #format line {<caf>%+12s: <fac>%-10s} {$tmp} {$_autobufs[$tmp][method]};
         #showme $line
         };
-        
+    #format line {<caf>%+12s: <fac>%-10s} {Focus Stat} {$focusStat};
+    #showme $line
     }
 }
 
@@ -95,6 +99,11 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
                 autobuf_set_pref_specific {strength} %3 %4;
                 pref_handled
             };
+            #case {"focus"} {
+                #var focusStat %3;
+                warn autobuf You will now use '%3' as your focus stat.;
+                pref_handled
+            }
         }
     }
 }
@@ -151,6 +160,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
     #if {@hasAffect{blade barrier} < 1} {doBladeBarrier};
     #if {@hasAffect{static field} < 1} {doStaticField};
     #if {@hasAffect{grim ward} < 1} {doGrimWard};
+    #if {@hasAffect{focus} < 1} {doFocus};
 
     #nop -- Affects we can renew during the last tick;
     #if {@hasAffect{unholy aura} < 2} {doUnholyAura};
@@ -377,6 +387,12 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
             }
 	    }
     } 
+}
+
+#alias doFocus {
+    #if {"$toggle[focus]" == "on"} {
+        nco focus $focusStat
+    }
 }
 
 #alias doGrimWard {
