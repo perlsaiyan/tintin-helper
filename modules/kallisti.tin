@@ -13,7 +13,7 @@
 	#if {@isloaded{events}} {
 		register_module kallisti
 	} {
-		fail_module kallist
+		fail_module kallisti
 	}
 }
 
