@@ -41,6 +41,8 @@ init toggle[guardian] preferences off;
 init toggle[bladebarrier] preferences off;
 init focusStat preferences dex;
 init toggle[focus] preferences off;
+init toggle[warcry] preferences off;
+init toggle[haste] preferences off;
 
 
 #foreach {autobless;autobark;autostatic;autoaura;autogrim;autodshield;autoffire} {tmp} {
@@ -276,7 +278,12 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 
 
 #alias doWarcry {
-    #if { "$MSDP_CLASS" == "Barbarian" } { queueAdd any {warcry} }
+    #if { (@epoch{} - $lastWarcry < 20) } { 
+        #nop
+    } {
+        #if { "$toggle[warcry]" == "on"} { queueAdd any {warcry} };
+        #VARIABLE lastWarcry @epoch{}
+    };
 }
 
 #alias doTaleOfValor {
@@ -284,11 +291,13 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 }
 
 #alias doHasteSpell {
-    #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
-        #if {$MSDP_MANA > 160} {queueAdd nco {haste group}}
-    } {
-        #if {$MSDP_MANA > 40}  {queueAdd nco {haste}}
-    }
+    #if { "$toggle[haste]" == "on" } {
+        #if {(&MSDP_GROUP) && (&MSDP_GROUP[] > 1) } {
+            #if {$MSDP_MANA > 160} {queueAdd nco {haste group}}
+        } {
+            #if {$MSDP_MANA > 40}  {queueAdd nco {haste}}
+        }
+    };
 }
 
 #alias doDivineArmor {
@@ -335,7 +344,9 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
                 #if {$MSDP_MANA > 40}  {queueAdd nco {vigor}}
             }
         } {
-            #if {&MSDP_GROUP[] > 1} {queueAdd nco gt all vigor group}
+            #if {@groupClassIsPresent{Prophet} || @groupClassIsPresent{Templar} || @groupClassIsPresent{Druid}} {
+                #if {&MSDP_GROUP[] > 1} {queueAdd nco gt all vigor group}
+            }
         }
     }
 }
