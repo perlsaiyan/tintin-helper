@@ -334,4 +334,23 @@
     #return 0;
 }
 
+#function average {
+    #local _sum 0;
+    #list _list create {%0};
+    #foreach {$_list[%*]} {_tmp} {
+        #math _sum {$_sum + $_tmp}
+    };
+    #math result {$_sum * 1.000 / &_list[]}
+}
+
+#function stddev {
+    #local _sum 0;
+    #local _MEAN @average{%0};
+    #list _list create {%0};
+    #foreach {$_list[%*]} {_tmp} {
+        #math _sum {$_sum + (($_MEAN - $_tmp) ** 2)}
+    };
+    #math result {($_sum / &_list[]) ** 0.5}
+}
+
 #nop -- vim: syntax=tt
