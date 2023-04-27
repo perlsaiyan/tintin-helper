@@ -49,8 +49,8 @@ init comms-session comms;
 
 #alias {update_chat} {
 	#var _msg %2;
-	#regex {_msg} {{} {\{};
-	#regex {_msg} {}} {\}};
+	#replace {_msg} {{} {\{};
+	#replace {_msg} {}} {\}};
 
 	#if {&chat[log][] >= $chat[rows]} {
 		#list chat[log] del 1
@@ -86,6 +86,10 @@ init comms-session comms;
     event_raise {commsClan} {$name} {%1} {%0};
 } {9}
 
+#action {~^\e[1;35m<Gemote> '{.*}' } {
+	event_raise {commsGemote} {} {%1} {%0};
+}
+
 #action {~^\e[1;35m<Gossip: %w> '{.*}'\e[0m$} {
     event_raise {commsGos} {%1} {%2} {%0};
 } {3}
@@ -93,8 +97,8 @@ init comms-session comms;
     event_raise {commsGos} {%1 (%2)} {%3} {%0};
 } {4}
 
-#action {~^\e[1;35m<Gemote> '%1 %2'$} {
-    event_raise {commsGos} {%1} {%2} {%0};
+#action {~^\e[1;35m<Gemote> '%1'\e[0m$} {
+    event_raise {commsGemote} {%1} {%2} {%0};
 }
 
 #action {~^\e[0;36m<Development: %w> '%2'\e[0m$} {
@@ -160,6 +164,7 @@ init comms-session comms;
 event_register {commsGroup} {kal_comms} {update_chat group {%4}};
 event_register {commsClan}  {kal_comms} {update_chat clan {%4}};
 event_register {commsGos}   {kal_comms} {update_chat gos {%4}};
+event_register {commsGemote}{kal_comms} {update_chat gemote {%4}};
 event_register {commsTell}  {kal_comms} {update_chat tell {%4}};
 event_register {commsWorld} {kal_comms} {update_chat world {%3}};
 event_register {commsDev}   {kal_comms} {update_chat dev {%4}};
