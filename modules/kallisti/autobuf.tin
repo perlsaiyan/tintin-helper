@@ -43,7 +43,7 @@ init focusStat preferences dex;
 init toggle[focus] preferences off;
 init toggle[warcry] preferences off;
 init toggle[haste] preferences off;
-
+init toggle[ceyes] preferences off;
 
 #foreach {autobless;autobark;autostatic;autoaura;autogrim;autodshield;autoffire} {tmp} {
     init $tmp preferences off;
@@ -170,6 +170,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
     #if {@hasAffect{vigor} < 2} {doVigor};
     #if {@hasAffect{barkskin} < 2} {doBarkskin};
     #if {@hasAffect{bless} < 2} {doBless};
+    #if {@hasAffect{crystal eyes} < 2} {doCrystalEyes};
 
     #nop TODO looping MSDP_AFFECTS isn't good enough, we need to do expired ones as well;
     #nop We also don't want events on negative ones;
@@ -196,9 +197,14 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
     }
 }
 
+#alias doCrystalEyes {
+    #if { "$toggle[ceyes]" == "on" && @hasAffect{true seeing} < 0} { 
+        queueAdd nco {ceyes} 
+    }
+}
+
 #alias doTruesee {
     #nop %0;
-    #if {@hasAffect{true seeing} < 1} {
         #switch {"$MSDP_CLASS"} {
             #case {"Prophet"} {queueAdd nco {true}};
             #case {"Druid"} {queueAdd nco {true}};
@@ -212,7 +218,6 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
                 }
             }
         };
-    };
 }
 
 #alias doStrength {
