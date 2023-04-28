@@ -87,8 +87,15 @@ event_register {variable MSDP_GROUP} {right} {generate_group_info {%0} {%1} {%2}
     #foreach *MSDP_GROUP[%*] {_idx} {
 		#var _flags $MSDP_GROUP[$_idx][flags];
 		#replace {_flags} {[ranged]} {>};
-        #format _line {<ffff>%-5s %-10.9s %-3s %-3s %-3s <ffff>%-4s}
-            {@withMe{$_idx}[$MSDP_GROUP[$_idx][class]]}
+		#local _lev $MSDP_GROUP[$_idx][level];
+		#if {$_lev > 99} {
+			#math {_lev} {$_lev - 100};
+			#var _lev *${_lev};
+		};
+
+        #format _line {<ffff>%-5s%+2s] %-10.9s %-3s %-3s %-3s <ffff>%-4s}
+            {@withMe{$_idx}[$MSDP_GROUP[$_idx][class]}
+			{$_lev}
             {$MSDP_GROUP[$_idx][name]}
             {@colorPct{$MSDP_GROUP[$_idx][health]}}
             {@colorPct{$MSDP_GROUP[$_idx][mana]}}
