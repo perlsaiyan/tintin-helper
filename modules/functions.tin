@@ -157,9 +157,14 @@
     #if {$MSDP_GROUP[%1][with_you] == 1} {
         #var result <ffff>
     } {
-        #var result <fbbb>
+        #if {$MSDP_GROUP[%1][with_leader] == 1 } {
+            #var result <fbbb>
+        } {
+            #var result <f00c>
+        }
     }
 }
+
 #func {colorPct} {
     #if { %1 > 95 } { #var result <f68f473>%1};
     #elseif { %1 > 80 } { #var result <f3ae722>%1};
