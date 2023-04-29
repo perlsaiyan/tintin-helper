@@ -93,11 +93,13 @@ event_register {mob kill} {odometer} {odometer_kills};
 
 #alias update_xp_block {
 	#var xp_block {XP/hr: <188>@avg_xp_per_hour{}<088><F5f819d> over <188>&_meter[XP][%*]<088><F5f819d> ticks};
+	#math _ttc {((@xpbanksize{} - $MSDP_EXPERIENCE) / @avg_xp{}) * 75/60};
+
 	#if {$MSDP_EXPERIENCE_TNL > 0} {
 		#math _ttl {($MSDP_EXPERIENCE_TNL / @avg_xp{}) * 75/60};
-		#var xp_block {$xp_block\nApprox. $_ttl mins to level}
+		#var xp_block {$xp_block\nApprox. <188>$_ttl<088><F5f819d> mins to level\nApprox. <188>$_ttc<088><F5f819d> mins to cap<088><F5f819d>}
 	} {
-		#var xp_block {$xp_block\nKill/hr: <188>@avg_kills_per_hour{}<088><F5f819d> over <188>&_meter[KILLS][%*]<088><F5f819d> ticks};
+		#var xp_block {$xp_block\nApprox. <188>$_ttc<088><F5f819d> mins to cap\nKill/hr: <188>@avg_kills_per_hour{}<088><F5f819d> over <188>&_meter[KILLS][%*]<088><F5f819d> ticks};
 	}
 }
 
@@ -136,7 +138,7 @@ event_register {mob kill} {odometer} {odometer_kills};
 	event_raise {level gain} {%1}
 }
 
-set_right_tile 4 <F5f819d> xp_block 2 tile;
+set_right_tile 4 <F5f819d> xp_block 3 tile;
 set_right_tile 5 <F5f819d> uptime_block 1 tile
 
 #nop vim: syntax=tt
