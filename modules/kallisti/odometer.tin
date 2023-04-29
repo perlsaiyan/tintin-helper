@@ -131,8 +131,14 @@ event_register {mob kill} {odometer} {odometer_kills};
 
 #al tnl {
 	#math _ttl {($MSDP_EXPERIENCE_TNL / @avg_xp{}) * 75/60};
-	gt XP: &0b@avg_xp_per_hour{}/hr&0e over last &0b&_meter[XP][%*]&0e ticks, Kills: &0b@avg_kills_per_hour{}&0e TNL: &0b@hNum{${MSDP_EXPERIENCE_TNL}}&0e, &0b$_ttl &0emins to level
+	#math _ttc {((@xpbanksize{} - $MSDP_EXPERIENCE) / @avg_xp{}) * 75/60};
+	#if {$MSDP_EXPERIENCE_TNL > 0} {
+		gt XP: &0b@avg_xp_per_hour{}/hr&0e over last &0b&_meter[XP][%*]&0e ticks, Kills: &0b@avg_kills_per_hour{}&0e TNL: &0b@hNum{${MSDP_EXPERIENCE_TNL}}&0e, &0b$_ttl &0emins to level, &0b$_ttc &0emins to cap
+	} {
+		gt XP: &0b@avg_xp_per_hour{}/hr&0e over last &0b&_meter[XP][%*]&0e ticks, Kills: &0b@avg_kills_per_hour{}&0e, &0b$_ttc &0emins to cap
+	}
 }
+
 
 #action {^--+  Congratulations, you are now level %d!} {
 	event_raise {level gain} {%1}
