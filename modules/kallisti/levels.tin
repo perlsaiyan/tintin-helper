@@ -375,6 +375,20 @@ Usage: levelreq <startlevel> <endlevel>}
 	}
 }
 
+#function bankmeter {
+	#local _msg XBPANK;
+	#local _size 30;
+	#if {"%1" != ""} {
+		#var _msg %1
+	}; 
+	#if {"%2" != ""} {
+		#var _size %2
+	};
+
+	#math _bank { $MSDP_EXPERIENCE * 1.00 / @xpbanksize{}};
+	#return @display_progress{$_bank;$_msg;$_size}
+}
+
 #function xpbanksize {
     #if {$MSDP_LEVEL > 94} {
      #var result 4294967295

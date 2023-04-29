@@ -133,7 +133,7 @@ Combat queues clear at the end of combat automatically.\n
 
 #alias {queue_block} {
 
-    #format {queue_block} {<388>%-39s<088>\nPriority: %d     Heal: %d     Any: %d\n  Combat: %d      NCO: %d    Move: %d}
+    #format {queue_block} {<388>%-44s<088>\nPriority: %d     Heal: %d     Any: %d\n  Combat: %d      NCO: %d    Move: %d}
     	{Action Queues}
         {&{_queue[priority][]}}
         {&{_queue[heal][]}}
@@ -173,6 +173,7 @@ Combat queues clear at the end of combat automatically.\n
         #case {"drop"} #var result 500;
         #case {"harvest"} #var result 0;
         #case {"extract"} #var result 3000;
+        #case {"hellstream"} #var result 1000;
         #default {
             #var result 2000;
             info spell Unknown delay for %1, using $result ms
