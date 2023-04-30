@@ -31,7 +31,11 @@
 			#session kallisti:%1 {kallistimud.com} {4000} {$players/%1_kallisti.player};
 		};
 	};
-	
+	#if {"%1" != "${char_name}"} {
+	    warn CONFIG '%1' does not match '${char_name}' in $players/%1_kallisti.player;
+	    #line log $log/tth.error warn CONFIG '%1' does not match char_name field '${char_name}' in $players/%1_kallisti.player;
+
+    };
 }
 
 #alias post_connect_load {
