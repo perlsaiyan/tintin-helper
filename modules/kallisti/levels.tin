@@ -376,7 +376,7 @@ Usage: levelreq <startlevel> <endlevel>}
 }
 
 #function bankmeter {
-	#local _msg XBPANK;
+	#local _msg XPBANK (@hNum{@xpbanksize{}});
 	#local _size 30;
 	#if {"%1" != ""} {
 		#var _msg %1
