@@ -142,5 +142,5 @@ event_register {variable MSDP_STAMINA} {autoheal} {autoheal};
             warn autoheal Please use 'healblack <add|del|show> [name]'.  Remember this is case sensitive;
         }
     }
-    _prefences_save
+    _preferences_save
 }
