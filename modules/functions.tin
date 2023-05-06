@@ -258,6 +258,11 @@
     }
 } {5}
 
+#alias {initlist %1 %2} {
+    #if {!&{%1}} {
+        #class %2 assign {#list %1 create}
+    }
+} {5}
 
 #function is_alias {
     #info aliases save;

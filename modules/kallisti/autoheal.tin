@@ -20,8 +20,9 @@
 init healpct preferences 80
 init refreshpct preferences 45
 init refreshManaThreshold preferences 320
+initlist healBlack preferences
+initlist refreshBlack preferences
 
-#list healblack create;
 event_register {variable MSDP_GROUP} {autoheal} {autoheal};
 event_register {variable MSDP_HEALTH} {autoheal} {autoheal};
 event_register {variable MSDP_STAMINA} {autoheal} {autoheal};
@@ -91,3 +92,55 @@ event_register {variable MSDP_STAMINA} {autoheal} {autoheal};
 
 #function refreshBlacklist {#list {refreshBlack} {find} {%1} {result}}
 #function healBlacklist {#list {healBlack} {find} {%1} {result}}
+
+#tab refreshblack
+#alias refreshblack {
+    #switch {"%1"} {
+        #case {"add"} {
+            #list refreshBlack add %2;
+            warn autoheal Added %2 to refresh blacklist
+        };
+        #case {"del"} {
+            #list refreshBlack find %2 _idx;
+            #if {$_idx > 0} {
+                #list refreshBlack delete $_idx;
+                warn autoheal Removed %2 from refresh blacklist at index $_idx
+            } {
+                warn autoheal %2 not in refresh blacklist
+            }
+        };
+        #case {"show"} {
+            #var refreshBlack
+        };
+        #default {
+            warn autoheal Please use 'refreshblack <add|del|show> [name].  Remember this is case sensitive;
+        }
+    }
+    _preferences_save
+}
+
+#tab healblack
+#alias healblack {
+    #switch {"%1"} {
+        #case {"add"} {
+            #list healBlack add %2;
+            warn autoheal Added %2 to heal blacklist
+        };
+        #case {"del"} {
+            #list healBlack find %2 _idx;
+            #if {$_idx > 0} {
+                #list healBlack delete $_idx;
+                warn autoheal Removed %2 from heal blacklist at index $_idx
+            } {
+                warn autoheal %2 not in heal blacklist
+            }
+        };
+        #case {"show"} {
+            #var healBlack
+        };
+        #default {
+            warn autoheal Please use 'healblack <add|del|show> [name]'.  Remember this is case sensitive;
+        }
+    }
+    _prefences_save
+}
