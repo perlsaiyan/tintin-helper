@@ -31,12 +31,16 @@
 			#session kallisti:%1 {kallistimud.com} {4000} {$players/%1_kallisti.player};
 		};
 	};
-	#if {"%1" != "${char_name}"} {
-	    warn CONFIG '%1' does not match '${char_name}' in $players/%1_kallisti.player;
-        #format {_ts} {%t} {%D %H:%m:%S};
-	    #line log $log/tth.error ${_ts} warn CONFIG '%1' does not match char_name field '${char_name}' in $players/%1_kallisti.player;
+	#if {@is_session{kallisti:%1}} {
+		#if {"%1" != "${char_name}"} {
+		    warn CONFIG '%1' does not match '${char_name}' in $players/%1_kallisti.player;
+    	    #format {_ts} {%t} {%D %H:%m:%S};
+		    #line log $log/tth.error ${_ts} warn CONFIG '%1' does not match char_name field '${char_name}' in $players/%1_kallisti.player;
 
-    };
+    	};
+	} {
+		err connect Connection failed.
+	}
 }
 
 #alias post_connect_load {
