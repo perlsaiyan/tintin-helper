@@ -22,7 +22,8 @@ to endlessly disappoint you with how much xp and gold you've used.
 		fail_module kallisti/meta Need queues module
 	}
 }
-
+init BASE_HEROS preferences 0
+init TARGET_HEROS preferences 0
 init metaXPCost preferences 0
 init metaAUCost preferences 0
 init metaHero preferences 0
