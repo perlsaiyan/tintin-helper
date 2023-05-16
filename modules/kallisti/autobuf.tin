@@ -44,6 +44,7 @@ init toggle[focus] preferences off;
 init toggle[warcry] preferences off;
 init toggle[haste] preferences off;
 init toggle[ceyes] preferences off;
+init toggle[vivify] preferences off;
 
 #foreach {autobless;autobark;autostatic;autoaura;autogrim;autodshield;autoffire} {tmp} {
     init $tmp preferences off;
@@ -162,6 +163,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
     #if {@hasAffect{blade barrier} < 1} {doBladeBarrier};
     #if {@hasAffect{static field} < 1} {doStaticField};
     #if {@hasAffect{grim ward} < 1} {doGrimWard};
+    #if {@hasAffect{vivify} < 1} {doVivify};
     #if {@autobuf_check{focus} && @hasAffect{focus} < 1} {doFocus};
 
     #nop -- Affects we can renew during the last tick;
@@ -194,6 +196,12 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
             #case {"strength"} { doStrength $_autobufs[%1][method]};
             #default {err autobuf No autobuf_handler for %1}
         }
+    }
+}
+
+#alias doVivify {
+    #if { "$toggle[vivify]" == "on"} { 
+        queueAdd nco {vivify} 
     }
 }
 
