@@ -46,6 +46,7 @@ init toggle[haste] preferences off;
 init toggle[ceyes] preferences off;
 init toggle[vivify] preferences off;
 init toggle[iceshield] preferences off;
+init toggle[blur] preferences off;
 
 #foreach {autobless;autobark;autostatic;autoaura;autogrim;autodshield;autoffire} {tmp} {
     init $tmp preferences off;
@@ -170,6 +171,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
 
     #nop -- Affects we can renew during the last tick;
     #if {@hasAffect{iceshield} < 2} {doIceshield};
+    #if {@hasAffect{blur} < 2} {doBlur};
     #if {@hasAffect{unholy aura} < 2} {doUnholyAura};
     #if {@hasAffect{divine armor} < 2} {doDivineArmor};
     #if {@hasAffect{vigor} < 2} {doVigor};
@@ -199,6 +201,12 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
             #case {"strength"} { doStrength $_autobufs[%1][method]};
             #default {err autobuf No autobuf_handler for %1}
         }
+    }
+}
+
+#alias doBlur {
+    #if { "$toggle[blur]" == "on"} { 
+        queueAdd nco {blur} 
     }
 }
 
