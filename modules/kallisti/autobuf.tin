@@ -41,12 +41,14 @@ init toggle[guardian] preferences off;
 init toggle[bladebarrier] preferences off;
 init focusStat preferences dex;
 init toggle[focus] preferences off;
-init toggle[warcry] preferences off;
 init toggle[haste] preferences off;
 init toggle[ceyes] preferences off;
 init toggle[vivify] preferences off;
 init toggle[iceshield] preferences off;
 init toggle[blur] preferences off;
+init toggle[warcry] preferences off;
+init toggle[warpaint] preferences off;
+init warpaint preferences mandrake;
 
 #foreach {autobless;autobark;autostatic;autoaura;autogrim;autodshield;autoffire} {tmp} {
     init $tmp preferences off;
@@ -166,6 +168,7 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
     #if {@hasAffect{static field} < 1} {doStaticField};
     #if {@hasAffect{grim ward} < 1} {doGrimWard};
     #if {@hasAffect{vivify} < 1} {doVivify};
+    #if {@hasAffect{warpaint} < 1} {doWarpaint};    
     
     #if {@autobuf_check{focus} && @hasAffect{focus} < 1} {doFocus};
 
@@ -209,6 +212,13 @@ event_register {autobuf expiration} {kallisti/autobuf} {autobuf_handler {%2}};
         queueAdd nco {blur} 
     }
 }
+
+#alias doWarpaint {
+    #if { "$toggle[warpaint]" == "on"} { 
+        queueAdd nco {warpaint mandrake} 
+    }
+}
+
 
 #alias doIceshield {
     #if { "$toggle[iceshield]" == "on"} { 
