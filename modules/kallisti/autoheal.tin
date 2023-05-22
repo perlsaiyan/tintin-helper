@@ -20,6 +20,7 @@
 init healpct preferences 80
 init refreshpct preferences 45
 init refreshManaThreshold preferences 320
+init toggle[cure] preferences off
 initlist healBlack preferences
 initlist refreshBlack preferences
 
@@ -67,13 +68,13 @@ event_register {variable MSDP_STAMINA} {autoheal} {autoheal};
             }
         };
         #regex {$MSDP_GROUP[$_tmp][flags]} {Paralyze} {
-            #if {"$remort[CURE]" == "1" && @with_you{$MSDP_GROUP[%_tmp][name]}} {queueAdd any cure $MSDP_GROUP[$_tmp][name]}
+            #if {"$toggle[CURE]" == "on" && $MSDP_GROUP[$_tmp][with_you]} {queueAdd any cure $MSDP_GROUP[$_tmp][name]}
         };
         #regex {$MSDP_GROUP[$_tmp][flags]} {Poisoned} {
-            #if {"$remort[CURE]" == "1" && @with_you{$MSDP_GROUP[%_tmp][name]}} {queueAdd any cure $MSDP_GROUP[$_tmp][name]}
+            #if {"$toggle[CURE]" == "on" && $MSDP_GROUP[$_tmp][with_you]} {queueAdd any cure $MSDP_GROUP[$_tmp][name]}
         };
         #regex {$MSDP_GROUP[$_tmp][flags]} {Blind} {
-            #if {"$remort[CURE]" == "1" && @with_you{$MSDP_GROUP[%_tmp][name]}} {queueAdd any cure $MSDP_GROUP[$_tmp][name]}
+            #if {"$toggle[cure]" == "on" && $MSDP_GROUP[$_tmp][with_you]} {queueAdd any cure $MSDP_GROUP[$_tmp][name]}
         }
     };
     #if {"$mount_heal" == "on"} {
