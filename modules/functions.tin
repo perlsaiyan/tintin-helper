@@ -363,4 +363,21 @@
     #math result {($_sum / &_list[]) ** 0.5}
 }
 
+#nop -- F7 toggle SENT OUTPUT debugging;
+#macro {\e[18~} {toggle_debug};
+#alias toggle_debug {
+    #info events save;
+    #local _check 0;
+    #foreach ${info[EVENTS][%1]} {_tmp} {
+        #if {"$_tmp[arg1]" == "SENT OUTPUT"} {#var _check 1}
+    };
+    #if {$_check == 0} {
+        #EVENT {SENT OUTPUT} {#echo {<F8E8888>%%0}};
+        warn debug Log SENT OUTPUT to screen
+    } {
+        #UNEVENT {SENT OUTPUT};
+        warn debug Do not log SENT OUTPUT to screen
+    }
+}
+
 #nop -- vim: syntax=tt
