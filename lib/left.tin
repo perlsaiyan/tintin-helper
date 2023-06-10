@@ -1,0 +1,90 @@
+#class {left} {kill}
+#class {left} {open}
+
+set_left_tile 6 <Fd5d8d6> player_info[%*] 30 tile;
+
+event_register {variable MSDP_CHARACTER_NAME} {left} {update_player_info %1};
+event_register {variable MSDP_LEVEL}  {left} {update_player_info %1};
+event_register {variable MSDP_CLASS} {left} {update_player_info %1};
+event_register {variable MSDP_RACE} {left} {update_player_info %1};
+event_register {variable MSDP_STR} {left} {update_player_info %1};
+event_register {variable MSDP_DEX} {left} {update_player_info %1};
+event_register {variable MSDP_INT} {left} {update_player_info %1};
+event_register {variable MSDP_WIS} {left} {update_player_info %1};
+event_register {variable MSDP_CON} {left} {update_player_info %1};
+event_register {variable MSDP_LUK} {left} {update_player_info %1};
+event_register {variable MSDP_MOUNT_NAME} {left} {update_player_info %1};
+event_register {variable MSDP_MOUNT_HEALTH} {left} {update_player_info %1};
+event_register {variable MSDP_MOUNT_HEALTH_MAX} {left} {update_player_info %1};
+event_register {variable MSDP_MOUNT_STAMINA} {left} {update_player_info %1};
+event_register {variable MSDP_MOUNT_STAMINA_MAX} {left} {update_player_info %1};
+event_register {variable MSDP_AFFECTS} {left} {update_player_info %1};
+event_register {variable MSDP_EXPERIENCE} {left} {update_player_info %1};
+event_register {variable MSDP_EXPERIENCE_TNL} {left} {update_player_info %1};
+event_register {variable MSDP_BANK_GOLD} {left} {update_player_info %1};
+event_register {variable MSDP_GOLD} {left} {update_player_info %1};
+event_register {variable MSDP_REMORTS_LAPS_IN_CLASS} {left} {update_player_info %1};
+event_register {variable MSDP_REMORTS_LAPS_TOTAL} {left} {update_player_info %1};
+
+#alias {update_player_info} {
+	#nop %0 %1;
+	
+	#format player_info[1] {<B538d87><388><188>%s} {Character};
+	
+	#format player_info[2] {<088>%-13s %-10s[%-3d]} {$MSDP_CHARACTER_NAME}
+			{$MSDP_CLASS} 			{$MSDP_LEVEL};
+	
+	#format player_info[3] {%-15s %+5s [%+5d]} 
+			{$MSDP_RACE} { } {$MSDP_ALIGNMENT};
+
+	#format player_info[4] { };
+	#format player_info[5] {<Fde935f>S:<Fd5d8d6>%-2s <Fde935f>I:<Fd5d8d6>%-2s <Fde935f>W:<Fd5d8d6>%-2s <Fde935f>D:<Fd5d8d6>%-2d <Fde935f>C:<Fd5d8d6>%-2d <Fde935f>L:<Fd5d8d6>%-2d}
+		{$MSDP_STR} {$MSDP_INT} {$MSDP_WIS} {$MSDP_DEX}
+		{$MSDP_CON} {$MSDP_LUK};
+
+	#format player_info[6] { };
+	#format player_info[7] {<Fde935f>Hero:<Fd5d8d6> %-5s   <Fde935f>TNL:<Fd5d8d6> %-6d} {$MSDP_HERO_POINTS} {$MSDP_HERO_POINTS_TNL};
+	#format player_info[8] {<Fde935f> Exp:<Fd5d8d6> %-6s  <Fde935f>TNL:<Fd5d8d6> %-6s} {@hNum{$MSDP_EXPERIENCE}} {@hNum{$MSDP_EXPERIENCE_TNL}};
+	#format player_info[9] {<Fde935f>Gold:<Fd5d8d6> %-6s <Fed935f>Bank:<Fd5d8d6> %-6s} {@hNum{$MSDP_GOLD}} {@hNum{$MSDP_BANK_GOLD}};
+
+	#format player_info[10] {<Fde935f>Est. Meta Sessions:<Fd5d8d6> %d} {@estimated_metas{}};
+	#format player_info[11] {};
+	#format player_info[12] {<B538d87><388><188>%s} {Affects};
+	#format player_info[13] {@get_affects_block{}};
+	#format player_info[14] {<B538d87><388><188>%s} {Mount};
+	#if {"$MSDP_MOUNT_NAME" != ""} {
+			#format player_info[15] {<088><Fde935f>Name: <Fd5d8d6>%s} {$MSDP_MOUNT_NAME};
+			#format player_info[16] {<088><Fde935f> HP: <Fd5d8d6>%-4d/%-4d <Fde935f>SP: <Fd5d8d6>%-4d/%-4d} {$MSDP_MOUNT_HEALTH} {$MSDP_MOUNT_HEALTH_MAX} {$MSDP_MOUNT_STAMINA} {$MSDP_MOUNT_STAMINA_MAX};
+	} {
+		#var player_info[17] {<088>};
+		#var player_info[18] {<088>};
+	};
+	#format player_info[19] { };
+	#format player_info[20] {<B538d87><388><188>%s} {Remort Info};
+	#format player_info[21] {<088><Fde935f>Total:<Fd5d8d6> %-d      <Fde935f>In Class:<Fd5d8d6> %-d} {$MSDP_REMORT_LAPS_TOTAL} {$MSDP_REMORTS_LAPS_IN_CLASS};
+
+	#format player_info[22] @bankmeter{XPBank (@hNum{@xpbanksize{}});30};
+
+	display_left_tiles;
+}
+
+
+#function get_affects_block {
+	#var counter 0;
+	#var result {<088>};
+	#foreach {*MSDP_AFFECTS[]} {tmp} {
+		#math counter {$counter + 1};
+		#if { ($counter % 2) == 1} {
+			#format result {%s<Fde935f>%%11.11s <Fd5d8d6>%%2d } {$result} {$tmp} {$MSDP_AFFECTS[$tmp]}
+		} {
+			#format result {%s<Fde935f>%%11.11s <Fd5d8d6>%%2d\n} {$result} {$tmp} {$MSDP_AFFECTS[$tmp]}
+		}
+	};
+	#replace {result} {\\n$} {};
+}
+
+update_player_info;
+
+#class {left} {close}
+#nop -- vim: syntax=tt
+
